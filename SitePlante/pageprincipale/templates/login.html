@@ -1,0 +1,12 @@
+{% extends "pagedebase.html" %}
+{% block title %} login {% endblock %}
+{% block content %}<section id="accueil" class="hero">
+             <form method="post" action= "{% url 'login' %}" >
+                {% csrf_token %}
+                {{ form.as_p }}
+                <p>
+                    <input type="submit" value="Se connecter" />
+                    <a href="{% url 'register' %}">Créer un compte</a>
+                </p>
+            </form>
+        </section> {% endblock %}
