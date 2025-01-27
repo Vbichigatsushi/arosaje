@@ -206,16 +206,25 @@ button:hover {
 
 /* section map */
 
+#map {
+  position: relative;
+}
+
+#controls input,
+#controls button {
+  padding: 10px;
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+}
+
 #map-container {
-  /* height: 500px;
+  height: 500px;
   width: 500px;
   padding: 5px;
-  margin: 50px; */
-
-  height: 500px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 5px;
+  margin: 50px;
+  margin-top: 10px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Media Queries */

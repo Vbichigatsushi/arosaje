@@ -14,21 +14,30 @@ links.forEach((link) => {
     const targetId = link.getAttribute("href").substring(1);
     const targetSection = document.getElementById(targetId);
 
-    // Si la section existe, l'afficher
+    // Afficher section si elle existe
     if (targetSection) {
       targetSection.classList.add("active");
+    }
+
+    if (targetId === "map") {
+      console.log("map init");
+      setTimeout(function () {
+        map.invalidateSize();
+      }, 200);
     }
   });
 });
 
-// démarrage de la page: acceuil par défaut
+// Démarrage de la page: acceuil par défaut
 
 document.getElementById("accueil").classList.add("active");
 
-// Parie Map
+// Partie Map
+
+let map;
 
 document.addEventListener("DOMContentLoaded", function () {
-  const map = L.map("map").setView([48.8566, 2.3522], 13);
+  map = L.map("map-container").setView([48.8566, 2.3522], 13);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors",
