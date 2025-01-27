@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      defer
+    ></script>
+    <title>AROSAJ'</title>
+  </head>
+  <body>
+    <header>AROSAJ'</header>
+
+    <main>
+      <section id="accueil" class="section">
+        <div class="hero">
+          <h1>Cultivez votre jardin intérieur</h1>
+          <p>
+            Découvrez l'art du jardinage et créez votre propre oasis de verdure
+          </p>
+        </div>
+
+        <section class="plants-grid">
+          <h2>Nos Plantes Vedettes</h2>
+          <div class="plant-cards">
+            <div class="plant-card">
+              <img
+                src="https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?w=500&auto=format"
+                alt="Monstera"
+              />
+              <h3>Monstera</h3>
+              <p>Plante tropicale facile d'entretien</p>
+            </div>
+            <div class="plant-card">
+              <img
+                src="https://cdn.pixabay.com/photo/2018/01/25/04/15/cactus-3105368_1280.jpg?w=500&auto=format"
+                alt="Cactus"
+              />
+              <h3>Cactus</h3>
+              <p>Parfait pour les débutants</p>
+            </div>
+            <div class="plant-card">
+              <img
+                src="https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=500&auto=format"
+                alt="Bonzai"
+              />
+              <h3>Bonzai</h3>
+              <p>Apporte une touche de fraîcheur</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="tips">
+          <h2>Conseils de Jardinage</h2>
+          <div class="tips-container">
+            <div class="tip">
+              <h3>🌿 Arrosage</h3>
+              <p>Apprenez à connaître les besoins en eau de vos plantes</p>
+            </div>
+            <div class="tip">
+              <h3>☀️ Luminosité</h3>
+              <p>Placez vos plantes selon leurs besoins en lumière</p>
+            </div>
+            <div class="tip">
+              <h3>🌡️ Température</h3>
+              <p>Maintenez une température adaptée à chaque espèce</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="contact">
+          <h2>Contactez-nous</h2>
+          <form>
+            <input placeholder="Votre nom" />
+            <input placeholder="Votre email" />
+            <textarea placeholder="Votre message"></textarea>
+            <button type="submit">Envoyer</button>
+          </form>
+        </section>
+      </section>
+
+      <section id="map" class="section">
+        <h2>Carte Interactive</h2>
+        <div id="controls">
+          <input
+            type="text"
+            id="addressInput"
+            placeholder="Entrez une adresse..."
+          />
+          <button id="searchButton">Ajouter un marqueur</button>
+        </div>
+        <div id="map-container"></div>
+      </section>
+    </main>
+
+    <footer>
+      <nav class="footer-nav">
+        <a href="#accueil" class="footer-link"
+          ><img src="img/icon-home.png" alt="Logo" class="footer-logo"
+        /></a>
+        <a href="#map" class="footer-link"
+          ><img src="img/icon-map.png" alt="Logo" class="footer-logo"
+        /></a>
+        <a href="#plant" class="footer-link"
+          ><img src="img/icon-plant.png" alt="Logo" class="footer-logo"
+        /></a>
+        <a href="#message" class="footer-link"
+          ><img src="img/icon-message.png" alt="Logo" class="footer-logo"
+        /></a>
+        <a href="#profil" class="footer-link"
+          ><img src="img/icon-profil.png" alt="Logo" class="footer-logo"
+        /></a>
+      </nav>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
