@@ -23,7 +23,7 @@ links.forEach((link) => {
       console.log("map init");
       setTimeout(function () {
         map.invalidateSize();
-      }, 200);
+      }, 10);
     }
   });
 });
