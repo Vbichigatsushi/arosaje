@@ -1,0 +1,18 @@
+{% extends "pagedebase.html" %}
+{% block title %}Demandes en attente{% endblock %}
+{% block content %}
+<h2>Demandes en attente</h2>
+<ul>
+    {% for demande in demandes %}
+        <li>
+            Plante : {{ demande.plante.nom_plante }} - Demandeur : {{ demande.utilisateur_demandeur.pseudo }}
+            <form action="{% url 'accepter_demande' demande.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit">Accepter</button>
+            </form>
+        </li>
+    {% empty %}
+        <p>Aucune demande en attente.</p>
+    {% endfor %}
+</ul>
+{% endblock %}

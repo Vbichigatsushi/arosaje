@@ -1,5 +1,6 @@
 {% extends "pagedebase.html" %}
 {% block title %} login {% endblock %}
+{% block headerContent %}{% endblock %}
 {% block content %}<section id="accueil" class="hero">
              <form method="post" action= "{% url 'login' %}" >
                 {% csrf_token %}
