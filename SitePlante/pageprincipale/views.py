@@ -14,7 +14,7 @@ def get_logged_form_request(request):
         except Utilisateur.DoesNotExist:
             return None
     return None
-# Create your views here.
+
 def profil(request):
     logged_user = get_logged_form_request(request)
     plantes_utilisateur = Plante.objects.filter(utilisateur=logged_user)
@@ -25,10 +25,17 @@ def profil(request):
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
+
 def index(request):
     logged_user = get_logged_form_request(request)
+    dernieres_demandes = (
+        Demande_plante.objects.values('plante').order_by('-date_demande')[:3]
+    )
+    dernieres_plantes = Plante.objects.filter(
+        id_plante__in=[demande['plante'] for demande in dernieres_demandes]
+    )
     if logged_user :
-        return render(request,'pageprincipale.html',{'logged_user':logged_user})
+        return render(request,'pageprincipale.html',{'logged_user':logged_user,'dernieres_plantes':dernieres_plantes})
     else:
         return redirect('login')
 

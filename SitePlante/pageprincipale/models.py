@@ -66,6 +66,7 @@ class Demande_plante(models.Model):
     )
     utilisateur_receveur = models.ForeignKey(
         Utilisateur, on_delete=models.SET_NULL, related_name='demandes_recues', null=True, blank=True
+
     )  # Par défaut, aucun receveur
     statut = models.CharField(
         max_length=20,

@@ -30,8 +30,7 @@ class UserNormalProfileForm(forms.ModelForm):
         model = Utilisateur
         exclude = ['adresse']  # Exclure le champ 'adresse'
 
-from django import forms
-from .models import Plante
+
 
 class PlanteForm(forms.ModelForm):
     class Meta:
