@@ -1,8 +1,9 @@
 from sys import prefix
 
 from django.shortcuts import render, redirect
-from pageprincipale.forms import LoginForm,UserNormalProfileForm,AdressForm,PlanteForm,DemandeForm
-from .models import Utilisateur, Plante, Demande_plante
+from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm, \
+    CommentaireForm;CommentaireForm
+from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
 
 
 def get_logged_form_request(request):
@@ -149,4 +150,63 @@ def faire_demande(request):
 
     else:
         # Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+        return redirect('login')
+
+def research_pro(request):
+    logged_user = get_logged_form_request(request)
+    search_query = request.GET.get('q', '')
+    utilisateurs_pro = Utilisateur.objects.filter(is_pro=True)
+    if logged_user:
+        if search_query:
+            utilisateurs_pro = utilisateurs_pro.filter(pseudo__icontains=search_query)
+        # Passe l'utilisateur connecté au template
+        return render(request, 'research_pro.html', {'logged_user': logged_user,'user_pro': utilisateurs_pro,'search_query':search_query})
+
+    else:
+        # Redirige vers la page de connexion si non connecté
+        return redirect('login')
+
+
+def demande(request):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        if request.method == 'POST':
+            form = DemandeAideForm(request.POST, request.FILES)
+            if form.is_valid():
+                Demande = form.save(commit=False)
+                Demande.User= logged_user  # Associer l'utilisateur connecté
+                Demande.save()
+                return redirect('demande')
+        else:
+            form = DemandeAideForm()
+        messages = Message.objects.order_by('-date_demande')
+        return render(request, 'demande.html',
+                      {'logged_user': logged_user, 'messages': messages,'form':form})
+    else:
+        # Redirige vers la page de connexion si non connecté
+        return redirect('login')
+
+
+
+
+def demande_aide(request,id):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        if request.method == 'POST':
+            form = CommentaireForm(request.POST)
+            if form.is_valid():
+                Com = form.save(commit=False)
+                Com.User= logged_user  # Associer l'utilisateur connecté
+                Com.demande=Message.objects.get(id_message=id)
+                Com.save()
+                return redirect('demande_aide', id=id)
+
+        else:
+            form = CommentaireForm()
+        message = Message.objects.get(id_message=id)
+        reponses = message.commentaires.all().order_by('-date_creation')
+        return render(request, 'demande_aide.html',
+                      {'logged_user': logged_user, 'message': message, 'reponses': reponses,'form':form})
+    else:
+        # Redirige vers la page de connexion si non connecté
         return redirect('login')
