@@ -22,13 +22,13 @@ class LoginForm(forms.Form):
 class AdressForm(forms.ModelForm):
     class Meta:
         model = Adresse
-        fields = '__all__'  # Inclut tous les champs du modèle
+        fields = '__all__'
 
 
 class UserNormalProfileForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        exclude = ['adresse']  # Exclure le champ 'adresse'
+        exclude = ['adresse']
 
 
 
@@ -49,7 +49,7 @@ from .models import Demande_plante, Plante
 class DemandeForm(forms.ModelForm):
     class Meta:
         model = Demande_plante
-        fields = ['plante', 'message']  # Plante et message sont les champs du formulaire
+        fields = ['plante', 'message']
 
     def __init__(self, *args, **kwargs):
         logged_user = kwargs.pop('logged_user', None)  # Récupérer l'utilisateur passé en argument

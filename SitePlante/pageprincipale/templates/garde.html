@@ -15,8 +15,8 @@
 {% for message in message_images %}
 {% if message.photo%}
 <img src="{{ message.photo.url }}">
-<p> {{message.text}} </p>
 {% endif %}
+<p> {{message.text}} </p>
 <br><hr><br>
 {% endfor %}
 {% endblock %}
