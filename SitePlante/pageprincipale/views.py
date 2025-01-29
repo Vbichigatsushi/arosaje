@@ -1,9 +1,15 @@
-from sys import prefix
 
+import requests
 from django.shortcuts import render, redirect
-from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm, \
-    CommentaireForm;CommentaireForm
-from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
+
+from pageprincipale.forms import LoginForm,UserNormalProfileForm,AdressForm,PlanteForm,DemandeForm
+from .models import Utilisateur, Plante, Demande_plante
+
+import json
+from .forms import UserNormalProfileForm
+import urllib.parse
+from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm,CommentaireForm,CommentaireForm
+from .models import Utilisateur, Plante, Demande_plante, Message
 
 
 def get_logged_form_request(request):
@@ -55,9 +61,31 @@ def login(request):
         return render(request,'login.html',{'form':form})
 
 
-
-from django.shortcuts import render, redirect
-from .forms import UserNormalProfileForm
+def geocode_address(address):
+    address_encoded = urllib.parse.quote(address)
+    url = f"https://nominatim.openstreetmap.org/search?format=json&q={address_encoded}"
+    headers = {
+        'User-Agent': 'SitePlante/1.0 (mailto:SitePlante@test.com)'  
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        try:
+            
+            data = response.json()
+            if data:
+                lat_str = data[0].get('lat')
+                lon_str = data[0].get('lon')
+                if lat_str and lon_str:
+                    lat = float(lat_str)
+                    lon = float(lon_str)
+                    return lat, lon
+            return None, None
+        except ValueError:
+            print("Erreur lors du décodage JSON.")
+            return None, None
+    else:
+        print(f"Erreur de l'API: {response.status_code}")
+        return None, None
 
 
 def creer_plante(request):
@@ -77,25 +105,57 @@ def creer_plante(request):
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
+    
+def creer_plante(request):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        if request.method == 'POST':
+            form = PlanteForm(request.POST, request.FILES)
+            if form.is_valid():
+                plante = form.save(commit=False)
+                plante.utilisateur = logged_user  # Associer l'utilisateur connecté
+                plante.save()
+                return redirect('profil')  # Rediriger vers la page profil ou autre page
+        else:
+            form = PlanteForm()
+
+        return render(request, 'creer_plante.html', {'form': form})
+    else:
+        # Redirige vers la page de connexion si non connecté
+        return redirect('login')
+    
 def register(request):
-    profile_type = None  # Valeur par défaut pour éviter les erreurs
+    profile_type = None 
     if request.method == 'POST' and 'profileType' in request.POST:
         profile_type = request.POST['profileType']
 
-        # Formulaires
         userclassique_form = UserNormalProfileForm(request.POST, prefix="uc")
         adresse_form = AdressForm(request.POST)
 
         if profile_type == 'Classiq_User':  # Si utilisateur classique
             if userclassique_form.is_valid() and adresse_form.is_valid():
                 adresse = adresse_form.save()
-                user = userclassique_form.save(commit=False)
-                user.adresse = adresse  # Associer l'adresse à l'utilisateur
-                user.save()  # Sauvegarder l'utilisateur
-
-                return redirect('login')  # Rediriger après l'enregistrement
+                address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France"
+                lat, lon = geocode_address(address)
+                
+                if lat is not None and lon is not None:
+                    user = userclassique_form.save(commit=False)
+                    user.adresse = adresse
+                    user.latitude = lat
+                    user.longitude = lon
+                    user.save()
+                    
+                    return redirect('login')
+                
+                else:
+                    adresse_form.add_error(None, "Erreur de géocodage.")
+                    return render(request, 'register.html', {
+                      'userclassique_form': userclassique_form,
+                      'adresse_form': adresse_form,
+                      'profileType': profile_type  # 
+                })
+              
             else:
-                # Si le formulaire est invalide, afficher les erreurs
                 return render(request, 'register.html', {
                     'userclassique_form': userclassique_form,
                     'adresse_form': adresse_form,
@@ -150,6 +210,35 @@ def faire_demande(request):
 
     else:
         # Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+        return redirect('login')
+    
+def interactiv_map(request):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        demandes = Demande_plante.objects.select_related('utilisateur_demandeur__adresse').all()
+        markers = []
+        for demande in demandes:
+            adresse = demande.utilisateur_demandeur.adresse
+            full_address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France"
+            plante_nom = demande.plante.nom_plante if demande.plante else "Nom de la plante non disponible"
+            lat = demande.utilisateur_demandeur.latitude
+            lon = demande.utilisateur_demandeur.longitude
+            markers.append({
+                'id': demande.id,
+                'adresse': full_address,
+                'pseudo': demande.utilisateur_demandeur.pseudo,
+                'nom': plante_nom,
+                'latitude': lat,
+                'longitude':lon
+                
+            })
+        markers_json = json.dumps(markers)  # Sérialisation en JSON
+        return render(request, 'interactiv-map.html', {
+            'logged_user': logged_user, 
+            'markers_json': markers_json  
+        })
+    else:
+        
         return redirect('login')
 
 def research_pro(request):

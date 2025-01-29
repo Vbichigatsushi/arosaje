@@ -32,6 +32,8 @@ class Utilisateur(models.Model):
     pseudo = models.CharField(max_length=255)  # Pseudo
     password = models.CharField(max_length=255)  # Mot de passe
     adresse = models.ForeignKey(Adresse, on_delete=models.CASCADE)  # Clé étrangère vers Adresse
+    longitude = models.FloatField(null=True, blank=True) 
+    latitude = models.FloatField(null=True, blank=True)
     REQUIRED_FIELDS = ['password']
     USERNAME_FIELD = 'pseudo'
     def __str__(self):
@@ -66,7 +68,6 @@ class Demande_plante(models.Model):
     )
     utilisateur_receveur = models.ForeignKey(
         Utilisateur, on_delete=models.SET_NULL, related_name='demandes_recues', null=True, blank=True
-
     )  # Par défaut, aucun receveur
     statut = models.CharField(
         max_length=20,
