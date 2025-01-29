@@ -1,0 +1,18 @@
+{% extends "pagedebase.html" %}
+{% block title %} Recherche de pro {% endblock %}
+{% block content %}
+<br><br><br>
+<form method="GET" action="{% url 'pro' %}">
+    <input type="text" name="q" placeholder="Rechercher un professionnel" value="{{ search_query }}">
+    <button type="submit">Rechercher</button>
+</form><br><br><br>
+{% for user in user_pro %}
+<span>
+{{user.pseudo}}
+  <br><br>
+  <HR>
+</span>
+{% endfor %}
+
+{% endblock %}
+

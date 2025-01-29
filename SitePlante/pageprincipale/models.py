@@ -80,3 +80,16 @@ class Demande_plante(models.Model):
 
     def __str__(self):
         return f"Demande pour {self.plante.nom_plante} par {self.utilisateur_demandeur.pseudo}"
+
+class Message(models.Model):
+    id_message=models.AutoField(primary_key=True)
+    User = models.ForeignKey('Utilisateur', on_delete=models.CASCADE)
+    text=models.CharField(max_length=500)
+    date_demande = models.DateTimeField(auto_now_add=True)
+    photo= models.ImageField(upload_to='photos_plantes/', blank=True, null=True)
+
+class Commentaire(models.Model):
+    demande = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='commentaires')
+    User = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
+    text = models.TextField()
+    date_creation = models.DateTimeField(auto_now_add=True)

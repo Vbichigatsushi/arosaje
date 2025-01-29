@@ -1,0 +1,33 @@
+{% extends "pagedebase.html" %}
+{% block content %}
+<br><br><br><br>
+<h1>Liste des demandes d'aide</h1>
+<br><br>
+<h2>Ajouter une demande</h2>
+ <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Affichage du formulaire sous forme de paragraphes -->
+        <button type="submit">Envoyer</button>
+    </form>
+<ul>
+    {% for message in messages %}
+        <li>{% if message.photo %}
+                    <img src="{{ plante.photo_plante.url }}">
+            <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
+            <img src="{{ message.photo.url}}" alt="{{ message.nom }}">
+            <p>Posté par {{ message.User.pseudo }}  {% if message.User.is_pro == True %}
+            🪴
+    {% endif %}le {{ message.date_demande }}
+            test</p>
+            {% else %}
+             <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
+            <p>Posté par {{ message.User.pseudo }}  {% if message.User.is_pro == True %}
+            🪴
+    {% endif %}le {{ message.date_demande }}
+            test</p>
+            {% endif %}
+            <br><HR><br>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

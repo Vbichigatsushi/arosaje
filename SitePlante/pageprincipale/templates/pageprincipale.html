@@ -10,24 +10,24 @@
         </section>
 
         <section id="plantes" class="plants-grid">
-            <h2>Nos Plantes Vedettes</h2>
+            <h2>Dernières plantes avec demande</h2>
+
+
             <div class="plant-cards">
-                <div class="plant-card">
-                    <img src="https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?w=500&auto=format" alt="Monstera">
-                    <h3>Monstera</h3>
-                    <p>Plante tropicale facile d'entretien</p>
-                </div>
-                <div class="plant-card">
-                    <img src="https://images.unsplash.com/photo-1593691509543-c55fb32e7355?w=500&auto=format" alt="Cactus">
-                    <h3>Cactus</h3>
-                    <p>Parfait pour les débutants</p>
-                </div>
-                <div class="plant-card">
-                    <img src="https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=500&auto=format" alt="Fougère">
-                    <h3>Bonzai</h3>
-                    <p>Apporte une touche de fraîcheur</p>
-                </div>
+            {% for plante in dernieres_plantes%}
+            <div class="plant-card">
+                {% if plante.photo_plante %}
+                <img src="{{ plante.photo_plante.url }}" alt="{{ plante.nom_plante }}">
+                {% else %}
+                <img src="https://via.placeholder.com/150" alt="{{ plante.nom_plante }}">
+                {% endif %}
+                <h3>{{ plante.nom_plante }}</h3>
+                <p>{{ plante.nom_plante }}</p>
             </div>
+            {% empty %}
+            <p>Vous n'avez pas encore ajouté de plantes.</p>
+            {% endfor %}
+        </div>
         </section>
 
         <section id="conseils" class="tips">

@@ -1,17 +1,16 @@
-{% extends "pagedebase.html" %}
-{% block title %}Faire une demande de gardiennage{% endblock %}
-{% block content %}
-    <h2>Faire une demande de gardiennage</h2>
+{% extends "pagedebase.html" %} {% block title %}Faire une demande de
+gardiennage{% endblock %} {% block content %} <br /><br /><br /><br /><br />
+<h2>Faire une demande de gardiennage</h2>
 
-    {% if error %}
-        <div class="error">
-            <p>{{ error }}</p>
-        </div>
-    {% endif %}
+{% if error %}
+<div class="error">
+  <p>{{ error }}</p>
+</div>
+{% endif %}
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}  <!-- Affiche les champs du formulaire -->
-        <button type="submit">Faire la demande</button>
-    </form>
+<form method="POST">
+  {% csrf_token %} {{ form.as_p }}
+  <!-- Affiche les champs du formulaire -->
+  <button type="submit">Faire la demande</button>
+</form>
 {% endblock %}

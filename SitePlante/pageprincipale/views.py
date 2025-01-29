@@ -1,13 +1,16 @@
-from sys import prefix
+
 import requests
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+
 from pageprincipale.forms import LoginForm,UserNormalProfileForm,AdressForm,PlanteForm,DemandeForm
 from .models import Utilisateur, Plante, Demande_plante
-from django.core.serializers.json import DjangoJSONEncoder
+
 import json
 from .forms import UserNormalProfileForm
 import urllib.parse
+from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm,CommentaireForm,CommentaireForm
+from .models import Utilisateur, Plante, Demande_plante, Message
+
 
 def get_logged_form_request(request):
     if 'logged_user_id' in request.session:
@@ -19,7 +22,6 @@ def get_logged_form_request(request):
             return None
     return None
 
-# Create your views here.
 def profil(request):
     logged_user = get_logged_form_request(request)
     plantes_utilisateur = Plante.objects.filter(utilisateur=logged_user)
@@ -30,10 +32,17 @@ def profil(request):
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
+
 def index(request):
     logged_user = get_logged_form_request(request)
+    dernieres_demandes = (
+        Demande_plante.objects.values('plante').order_by('-date_demande')[:3]
+    )
+    dernieres_plantes = Plante.objects.filter(
+        id_plante__in=[demande['plante'] for demande in dernieres_demandes]
+    )
     if logged_user :
-        return render(request,'pageprincipale.html',{'logged_user':logged_user})
+        return render(request,'pageprincipale.html',{'logged_user':logged_user,'dernieres_plantes':dernieres_plantes})
     else:
         return redirect('login')
 
@@ -55,16 +64,10 @@ def login(request):
 def geocode_address(address):
     address_encoded = urllib.parse.quote(address)
     url = f"https://nominatim.openstreetmap.org/search?format=json&q={address_encoded}"
-
-    
     headers = {
         'User-Agent': 'SitePlante/1.0 (mailto:SitePlante@test.com)'  
     }
-    
-    
     response = requests.get(url, headers=headers)
-    
-    
     if response.status_code == 200:
         try:
             
@@ -103,9 +106,24 @@ def creer_plante(request):
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
     
+def creer_plante(request):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        if request.method == 'POST':
+            form = PlanteForm(request.POST, request.FILES)
+            if form.is_valid():
+                plante = form.save(commit=False)
+                plante.utilisateur = logged_user  # Associer l'utilisateur connecté
+                plante.save()
+                return redirect('profil')  # Rediriger vers la page profil ou autre page
+        else:
+            form = PlanteForm()
 
-
-
+        return render(request, 'creer_plante.html', {'form': form})
+    else:
+        # Redirige vers la page de connexion si non connecté
+        return redirect('login')
+    
 def register(request):
     profile_type = None 
     if request.method == 'POST' and 'profileType' in request.POST:
@@ -141,7 +159,7 @@ def register(request):
                 return render(request, 'register.html', {
                     'userclassique_form': userclassique_form,
                     'adresse_form': adresse_form,
-                    'profileType': profile_type  
+                    'profileType': profile_type  # Ajouter profileType au contexte
                 })
     else:
         # Si c'est une requête GET, initialiser les formulaires et définir profileType à None
@@ -221,4 +239,63 @@ def interactiv_map(request):
         })
     else:
         
+        return redirect('login')
+
+def research_pro(request):
+    logged_user = get_logged_form_request(request)
+    search_query = request.GET.get('q', '')
+    utilisateurs_pro = Utilisateur.objects.filter(is_pro=True)
+    if logged_user:
+        if search_query:
+            utilisateurs_pro = utilisateurs_pro.filter(pseudo__icontains=search_query)
+        # Passe l'utilisateur connecté au template
+        return render(request, 'research_pro.html', {'logged_user': logged_user,'user_pro': utilisateurs_pro,'search_query':search_query})
+
+    else:
+        # Redirige vers la page de connexion si non connecté
+        return redirect('login')
+
+
+def demande(request):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        if request.method == 'POST':
+            form = DemandeAideForm(request.POST, request.FILES)
+            if form.is_valid():
+                Demande = form.save(commit=False)
+                Demande.User= logged_user  # Associer l'utilisateur connecté
+                Demande.save()
+                return redirect('demande')
+        else:
+            form = DemandeAideForm()
+        messages = Message.objects.order_by('-date_demande')
+        return render(request, 'demande.html',
+                      {'logged_user': logged_user, 'messages': messages,'form':form})
+    else:
+        # Redirige vers la page de connexion si non connecté
+        return redirect('login')
+
+
+
+
+def demande_aide(request,id):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        if request.method == 'POST':
+            form = CommentaireForm(request.POST)
+            if form.is_valid():
+                Com = form.save(commit=False)
+                Com.User= logged_user  # Associer l'utilisateur connecté
+                Com.demande=Message.objects.get(id_message=id)
+                Com.save()
+                return redirect('demande_aide', id=id)
+
+        else:
+            form = CommentaireForm()
+        message = Message.objects.get(id_message=id)
+        reponses = message.commentaires.all().order_by('-date_creation')
+        return render(request, 'demande_aide.html',
+                      {'logged_user': logged_user, 'message': message, 'reponses': reponses,'form':form})
+    else:
+        # Redirige vers la page de connexion si non connecté
         return redirect('login')

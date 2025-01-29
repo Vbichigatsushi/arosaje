@@ -2,7 +2,7 @@
 
 from .models import Plante
 from django import forms
-from pageprincipale.models import Utilisateur, Plante, Adresse, Demande_plante
+from pageprincipale.models import Utilisateur, Plante, Adresse, Demande_plante, Message, Commentaire
 
 
 class LoginForm(forms.Form):
@@ -23,7 +23,7 @@ class LoginForm(forms.Form):
 class AdressForm(forms.ModelForm):
     class Meta:
         model = Adresse
-        fields = '__all__' 
+        fields = '__all__'  # Inclut tous les champs du modèle
 
 
 class UserNormalProfileForm(forms.ModelForm):
@@ -59,3 +59,21 @@ class DemandeForm(forms.ModelForm):
         if logged_user:
             # Filtrer les plantes de l'utilisateur connecté
             self.fields['plante'].queryset = Plante.objects.filter(utilisateur=logged_user)
+
+class DemandeAideForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['text', 'photo']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['text'].widget = forms.Textarea(attrs={'rows': 4, 'placeholder': 'Entrez votre message'})
+
+class CommentaireForm(forms.ModelForm):
+    class Meta:
+        model = Commentaire
+        fields = ['text']
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['text'].widget = forms.Textarea(attrs={'rows': 4, 'placeholder': 'Entrez votre commentaire'})
