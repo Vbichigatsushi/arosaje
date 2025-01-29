@@ -1,0 +1,28 @@
+{% extends "pagedebase.html" %}
+{% block title %}Les demandes de gardes{% endblock %}
+{% block content %}
+<br><br><br><br>
+    <h1>Les demandes de gardes</h1>
+<section id="plantes4" class="plants-grid">
+{% for Demande in Demandes %}
+  <div class="plant-card">
+<p> {{Demande.utilisateur_demandeur}} demande la garde de sa plante : {{Demande.plante.nom_plante}} </p>
+{% if Demande.plante.photo_plante %}
+                    <img src="{{ Demande.plante.photo_plante.url }}">
+
+{% if Demande.utilisateur_receveur == null %}
+<form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="demande_id" value="{{ Demande.id }}">
+            <button type="submit">Accepter cette demande</button>
+        </form>
+{% else %}
+Garde accepté par {{Demande.utilisateur_receveur}}
+{% endif %}
+  </div>
+</section>
+<br><br><br><br>
+{% endif %}
+
+{% endfor %}
+{% endblock %}

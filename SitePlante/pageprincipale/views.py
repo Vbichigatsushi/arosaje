@@ -2,7 +2,7 @@ from sys import prefix
 
 from django.shortcuts import render, redirect
 from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm, \
-    CommentaireForm;CommentaireForm
+    CommentaireForm, GardeForm,CommentaireForm,MessageImage
 from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
 
 
@@ -19,9 +19,11 @@ def get_logged_form_request(request):
 def profil(request):
     logged_user = get_logged_form_request(request)
     plantes_utilisateur = Plante.objects.filter(utilisateur=logged_user)
+    Demande_demander=Demande_plante.objects.filter(utilisateur_demandeur=logged_user)
+    Demande_receveur = Demande_plante.objects.filter(utilisateur_receveur=logged_user)
     if logged_user:
         # Passe l'utilisateur connecté au template
-        return render(request, 'profil.html', {'logged_user': logged_user,'plantes_utilisateur': plantes_utilisateur})
+        return render(request, 'profil.html', {'Demande_demandeur':Demande_demander,'logged_user': logged_user,'plantes_utilisateur': plantes_utilisateur,'Demande_receveur': Demande_receveur})
 
     else:
         # Redirige vers la page de connexion si non connecté
@@ -207,6 +209,46 @@ def demande_aide(request,id):
         reponses = message.commentaires.all().order_by('-date_creation')
         return render(request, 'demande_aide.html',
                       {'logged_user': logged_user, 'message': message, 'reponses': reponses,'form':form})
+    else:
+        # Redirige vers la page de connexion si non connecté
+        return redirect('login')
+
+def all_demande_garde(request):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        if request.method == "POST":
+            demande_id = request.POST.get("demande_id")
+            demande=Demande_plante.objects.get(id=demande_id)
+            if demande.utilisateur_receveur is None:
+
+                demande.utilisateur_receveur = logged_user
+                demande.statut = "acceptée"
+                demande.save()
+        Demandes = Demande_plante.objects.order_by('-date_demande')
+        return render(request, 'all_demande_garde.html',
+                      {'logged_user': logged_user, 'Demandes': Demandes})
+    else:
+        return redirect('login')
+
+def garde(request,id):
+    logged_user = get_logged_form_request(request)
+    form= GardeForm(request.POST)
+    if logged_user:
+        if request.method == 'POST':
+            form = GardeForm(request.POST, request.FILES)
+            if form.is_valid():
+                messagephoto = form.save(commit=False)
+                messagephoto.Demande = Demande_plante.objects.get(id=id) # Associer l'utilisateur connecté
+                messagephoto.save()
+                message_images = MessageImage.objects.filter(Demande=Demande_plante.objects.get(id=id))
+                return render(request, 'garde.html',
+                              {'logged_user': logged_user, 'form': form, 'message_images':message_images,'id':id})
+        else :
+            form = GardeForm()
+            Demande = Demande_plante.objects.get(id=id)
+            message_images = MessageImage.objects.filter(Demande=Demande)
+            return render(request, 'garde.html',
+                      {'logged_user': logged_user, 'Demande': Demande,'form':form,'message_images':message_images})
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')

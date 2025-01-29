@@ -59,6 +59,7 @@ class Demande(models.Model):
     def __str__(self):
         return f"Demande de {self.utilisateur} pour {self.plante}"
 
+
 class Demande_plante(models.Model):
     plante = models.ForeignKey('Plante', on_delete=models.CASCADE)
     utilisateur_demandeur = models.ForeignKey(
@@ -76,6 +77,9 @@ class Demande_plante(models.Model):
     message=models.CharField(max_length=255,null=True)
     date_demande = models.DateTimeField(auto_now_add=True)
     date_reponse = models.DateTimeField(null=True, blank=True)
+    photo_plante1 = models.ImageField(upload_to='photos_plantes/', blank=True, null=True)
+    photo_plante2 = models.ImageField(upload_to='photos_plantes/', blank=True, null=True)
+    photo_plante3 = models.ImageField(upload_to='photos_plantes/', blank=True, null=True)
 
     def __str__(self):
         return f"Demande pour {self.plante.nom_plante} par {self.utilisateur_demandeur.pseudo}"
@@ -92,3 +96,8 @@ class Commentaire(models.Model):
     User = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
     text = models.TextField()
     date_creation = models.DateTimeField(auto_now_add=True)
+
+class MessageImage(models.Model):
+    Demande = models.ForeignKey('Demande_plante',on_delete=models.CASCADE)
+    text=text=models.CharField(max_length=250, blank=True, null=True)
+    photo = models.ImageField(upload_to='photos_plantes/', blank=True, null=True)

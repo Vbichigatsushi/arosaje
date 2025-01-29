@@ -2,9 +2,8 @@
 {% block content %}
 <br><br><br><br><br>
 {% if message.photo %}
-                    <img src="{{ plante.photo_plante.url }}" alt="{{ message.text }}">
             <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
-            <img src="{{ message.photo.url}}" alt="{{ message.nom }}">
+            <img src="{{ message.photo.url}}">
             <p>Posté par {{ message.User.pseudo }} {% if message.User.is_pro == True %}
             🪴
     {% endif %} le {{ message.date_demande }}

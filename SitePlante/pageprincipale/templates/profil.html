@@ -22,7 +22,6 @@
                 <img src="https://via.placeholder.com/150" alt="{{ plante.nom_plante }}">
                 {% endif %}
                 <h3>{{ plante.nom_plante }}</h3>
-                <p>Plante tropicale facile d'entretien</p>
             </div>
             {% empty %}
             <p>Vous n'avez pas encore ajouté de plantes.</p>
@@ -31,33 +30,39 @@
             <a href="{% url 'creer_plante' %}" class="btn btn-primary">Ajouter une nouvelle plante</a>
     </section>
 
+    <section id="plantes2" class="plants-grid">
+        <h2>Vos demandes de garde </h2>
+        <div class="plant-cards">
+            {% for Demande in Demande_demandeur %}
+            <div class="plant-card"> <a href="{% url 'garde' Demande.id %}">
+                {% if Demande.plante.photo_plante %}
+                <img src="{{ Demande.plante.photo_plante.url }}">
+                {% else %}
+                <img src="https://via.placeholder.com/150" alt="{{ plante.nom_plante }}">
+                {% endif %}
 
-        <section id="conseils" class="tips">
-            <h2>Conseils de Jardinage</h2>
-            <div class="tips-container">
-                <div class="tip">
-                    <h3>🌿 Arrosage</h3>
-                    <p>Apprenez à connaître les besoins en eau de vos plantes</p>
-                </div>
-                <div class="tip">
-                    <h3>☀️ Luminosité</h3>
-                    <p>Placez vos plantes selon leurs besoins en lumière</p>
-                </div>
-                <div class="tip">
-                    <h3>🌡️ Température</h3>
-                    <p>Maintenez une température adaptée à chaque espèce</p>
-                </div>
+                <h3> {{ Demande.plante.nom_plante }}</h3></a>
             </div>
-        </section>
+            {% empty %}
+            <p>Vous n'avez pas encore fait de demande de garde.</p>
+            {% endfor %}
+        </div>
+    </section>
+        <section id="plantes3" class="plants-grid">
+        <h2>Les demandes de gardes acceptées</h2>
+        <div class="plant-cards">
+            {% for Demande in  Demande_receveur %}
+            <div class="plant-card"><a href="{% url 'garde' Demande.id %}">
+                {% if Demande.plante.photo_plante %}
+                <img src="{{ Demande.plante.photo_plante.url }}">
+                {% endif %}
+                <h3>{{ Demande.plante.nom_plante }}</h3></a>
 
-        <section id="contact" class="contact">
-            <h2>Contactez-nous</h2>
-            <form>
-                <input type="text" placeholder="Votre nom">
-                <input type="email" placeholder="Votre email">
-                <textarea placeholder="Votre message"></textarea>
-                <button type="submit">Envoyer</button>
-            </form>
-        </section>
+            </div>
+            {% empty %}
+            <p>Vous n'avez pas encore accepté de garder une plante.</p>
+            {% endfor %}
+        </div>
+    </section>
     </main>
 {% endblock %}

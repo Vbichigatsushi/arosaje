@@ -25,9 +25,10 @@
                 <p>{{ plante.nom_plante }}</p>
             </div>
             {% empty %}
-            <p>Vous n'avez pas encore ajouté de plantes.</p>
+            <p>Pas de plante ajoutée</p>
             {% endfor %}
         </div>
+            <a href="{% url 'all_demande_garde' %}"> Regarder l'ensemble des demandes</a>
         </section>
 
         <section id="conseils" class="tips">
