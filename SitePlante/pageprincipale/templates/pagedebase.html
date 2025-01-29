@@ -1,0 +1,46 @@
+{%load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css'%}" : />
+
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreenThumb - {% block title %}{% endblock %}</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script
+      type="text/javascript"
+      src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+    ></script>
+  </head>
+  <body>
+    {% block headerContent %}
+    <header>
+      <nav>
+        <div class="logo">GreenThumb 🌱</div>
+        <ul>
+          <li><a href="{% url 'index' %}">Accueil</a></li>
+          <li><a href="{% url 'interactiv-map' %}">Carte</a></li>
+          <li><a href="#plantes">Demande de garde </a></li>
+          <li><a href="#conseils">Contact d'un specialiste</a></li>
+          <li><a href="{% url 'profil' %}">Profil</a></li>
+        </ul>
+      </nav>
+    </header>
+    {% endblock %} {% block content %} {% endblock %}
+    <br />
+    <br />
+    <br />
+    <br />
+    <footer>
+      <p>&copy; 2024 GreenThumb</p>
+    </footer>
+  </body>
+</html>

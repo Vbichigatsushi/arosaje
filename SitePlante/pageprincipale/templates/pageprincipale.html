@@ -1,0 +1,61 @@
+{% extends "pagedebase.html" %}
+{% block title %} Page d'accueil {% endblock %}
+
+{% block content %}
+
+    <main>
+        <section id="accueil" class="hero">
+            <h1>Bonjour à vous {{ logged_user.pseudo}} !Cultivez votre jardin intérieur</h1>
+            <p>Découvrez l'art du jardinage et créez votre propre oasis de verdure</p>
+        </section>
+
+        <section id="plantes" class="plants-grid">
+            <h2>Nos Plantes Vedettes</h2>
+            <div class="plant-cards">
+                <div class="plant-card">
+                    <img src="https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?w=500&auto=format" alt="Monstera">
+                    <h3>Monstera</h3>
+                    <p>Plante tropicale facile d'entretien</p>
+                </div>
+                <div class="plant-card">
+                    <img src="https://images.unsplash.com/photo-1593691509543-c55fb32e7355?w=500&auto=format" alt="Cactus">
+                    <h3>Cactus</h3>
+                    <p>Parfait pour les débutants</p>
+                </div>
+                <div class="plant-card">
+                    <img src="https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=500&auto=format" alt="Fougère">
+                    <h3>Bonzai</h3>
+                    <p>Apporte une touche de fraîcheur</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="conseils" class="tips">
+            <h2>Conseils de Jardinage</h2>
+            <div class="tips-container">
+                <div class="tip">
+                    <h3>🌿 Arrosage</h3>
+                    <p>Apprenez à connaître les besoins en eau de vos plantes</p>
+                </div>
+                <div class="tip">
+                    <h3>☀️ Luminosité</h3>
+                    <p>Placez vos plantes selon leurs besoins en lumière</p>
+                </div>
+                <div class="tip">
+                    <h3>🌡️ Température</h3>
+                    <p>Maintenez une température adaptée à chaque espèce</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <h2>Contactez-nous</h2>
+            <form>
+                <input type="text" placeholder="Votre nom">
+                <input type="email" placeholder="Votre email">
+                <textarea placeholder="Votre message"></textarea>
+                <button type="submit">Envoyer</button>
+            </form>
+        </section>
+    </main>
+{% endblock %}

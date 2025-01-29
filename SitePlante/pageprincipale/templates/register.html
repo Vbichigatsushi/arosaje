@@ -1,0 +1,23 @@
+{% extends "pagedebase.html" %}
+{% block title %}Création d'un profil{% endblock %}
+{% block headerContent %}{% endblock %}
+{% block content %}
+<section id="accueil" class="hero">
+    <h1>Création d'un compte</h1>
+
+    <!-- Menu déroulant pour sélectionner le type de profil -->
+   <form method="POST" action="{% url 'register' %}">
+    {% csrf_token %}
+<input type="hidden" name="profileType" value="Classiq_User">
+    <!-- Formulai&erre pour utilisateur classique -->
+        <div id="classique_user_form">
+            {{ userclassique_form.as_p }}
+            <h3>Informations sur l'adresse</h3>
+            {{ adresse_form.as_p }}
+        </div>
+
+
+
+    <button type="submit">S'inscrire</button>
+</form>
+{% endblock %}
