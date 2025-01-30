@@ -69,9 +69,9 @@ def creer_plante(request):
             form = PlanteForm(request.POST, request.FILES)
             if form.is_valid():
                 plante = form.save(commit=False)
-                plante.utilisateur = logged_user
+                plante.utilisateur = logged_user  # Associer l'utilisateur connecté
                 plante.save()
-                return redirect('profil')
+                return redirect('profil')  # Rediriger vers la page profil ou autre page
         else:
             form = PlanteForm()
 
@@ -80,7 +80,7 @@ def creer_plante(request):
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
 def register(request):
-    profile_type = None
+    profile_type = None  # Valeur par défaut pour éviter les erreurs
     if request.method == 'POST' and 'profileType' in request.POST:
         profile_type = request.POST['profileType']
 
@@ -88,19 +88,20 @@ def register(request):
         userclassique_form = UserNormalProfileForm(request.POST, prefix="uc")
         adresse_form = AdressForm(request.POST)
 
-        if profile_type == 'Classiq_User':
+        if profile_type == 'Classiq_User':  # Si utilisateur classique
             if userclassique_form.is_valid() and adresse_form.is_valid():
                 adresse = adresse_form.save()
                 user = userclassique_form.save(commit=False)
-                user.adresse = adresse
-                user.save()
+                user.adresse = adresse  # Associer l'adresse à l'utilisateur
+                user.save()  # Sauvegarder l'utilisateur
 
-                return redirect('login')
+                return redirect('login')  # Rediriger après l'enregistrement
             else:
+                # Si le formulaire est invalide, afficher les erreurs
                 return render(request, 'register.html', {
                     'userclassique_form': userclassique_form,
                     'adresse_form': adresse_form,
-                    'profileType': profile_type
+                    'profileType': profile_type  # Ajouter profileType au contexte
                 })
     else:
         # Si c'est une requête GET, initialiser les formulaires et définir profileType à None
@@ -249,4 +250,5 @@ def garde(request,id):
             return render(request, 'garde.html',
                       {'logged_user': logged_user, 'Demande': Demande,'form':form,'message_images':message_images})
     else:
+        # Redirige vers la page de connexion si non connecté
         return redirect('login')
