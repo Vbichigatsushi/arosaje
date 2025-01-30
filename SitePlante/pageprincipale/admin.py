@@ -1,9 +1,10 @@
 from django.contrib import admin
-from pageprincipale.models import Person, Plante, Adress, Quality, Professionnel, Classiq_User
+from pageprincipale.models import Utilisateur, Plante, Adresse,Demande_plante,Demande,Message,Commentaire
 
-admin.site.register(Person)
+admin.site.register(Utilisateur)
 admin.site.register(Plante)
-admin.site.register(Quality)
-admin.site.register(Adress)
-admin.site.register(Professionnel)
-admin.site.register(Classiq_User)
+admin.site.register(Adresse)
+admin.site.register(Demande_plante)
+admin.site.register(Demande)
+admin.site.register(Message)
+admin.site.register(Commentaire)

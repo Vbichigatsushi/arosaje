@@ -1,0 +1,63 @@
+{% extends "pagedebase.html" %}
+{% block title %} Profil {% endblock %}
+{% block content %}
+
+    <main>
+        <br>
+        <br>
+        <br>
+        <h2> Vos informations</h2>
+        <p> Votre pseudo : {{ logged_user.pseudo}} </p>
+        <p> Votre adresse : {{ logged_user.adresse}} </p>
+        <p> Vous êtes un pro: {{ logged_user.is_pro}} </p>
+
+        <section id="plantes" class="plants-grid">
+        <h2>Vos plantes</h2>
+        <div class="plant-cards">
+            {% for plante in plantes_utilisateur %}
+            <div class="plant-card">
+                {% if plante.photo_plante %}
+                <img src="{{ plante.photo_plante.url }}" alt="{{ plante.nom_plante }}">
+                {% else %}
+                <img src="https://via.placeholder.com/150" alt="{{ plante.nom_plante }}">
+                {% endif %}
+                <h3>{{ plante.nom_plante }}</h3>
+                <p>Plante tropicale facile d'entretien</p>
+            </div>
+            {% empty %}
+            <p>Vous n'avez pas encore ajouté de plantes.</p>
+            {% endfor %}
+        </div>
+            <a href="{% url 'creer_plante' %}" class="btn btn-primary">Ajouter une nouvelle plante</a>
+    </section>
+
+
+        <section id="conseils" class="tips">
+            <h2>Conseils de Jardinage</h2>
+            <div class="tips-container">
+                <div class="tip">
+                    <h3>🌿 Arrosage</h3>
+                    <p>Apprenez à connaître les besoins en eau de vos plantes</p>
+                </div>
+                <div class="tip">
+                    <h3>☀️ Luminosité</h3>
+                    <p>Placez vos plantes selon leurs besoins en lumière</p>
+                </div>
+                <div class="tip">
+                    <h3>🌡️ Température</h3>
+                    <p>Maintenez une température adaptée à chaque espèce</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <h2>Contactez-nous</h2>
+            <form>
+                <input type="text" placeholder="Votre nom">
+                <input type="email" placeholder="Votre email">
+                <textarea placeholder="Votre message"></textarea>
+                <button type="submit">Envoyer</button>
+            </form>
+        </section>
+    </main>
+{% endblock %}

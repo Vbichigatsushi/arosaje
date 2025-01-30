@@ -1,6 +1,6 @@
 {% extends "pagedebase.html" %}
 {% block title %}Création d'un profil{% endblock %}
-
+{% block headerContent %}{% endblock %}
 {% block content %}
 <section id="accueil" class="hero">
     <h1>Création d'un compte</h1>
@@ -8,33 +8,15 @@
     <!-- Menu déroulant pour sélectionner le type de profil -->
    <form method="POST" action="{% url 'register' %}">
     {% csrf_token %}
-
-    <!-- Sélection du profil -->
-    <p>
-        <label for="profileType">Vous êtes :</label>
-        <select id="profileType" name="profileType" onchange="this.form.submit()">
-            <option value="Classiq_User" {% if profileType == 'Classiq_User' %}selected{% endif %}>Utilisateur classique</option>
-            <option value="Professionnel" {% if profileType == 'Professionnel' %}selected{% endif %}>Professionnel</option>
-        </select>
-    </p>
-
-    <!-- Formulaire pour utilisateur classique -->
-    {% if profileType == 'Classiq_User' %}
+<input type="hidden" name="profileType" value="Classiq_User">
+    <!-- Formulai&erre pour utilisateur classique -->
         <div id="classique_user_form">
             {{ userclassique_form.as_p }}
             <h3>Informations sur l'adresse</h3>
             {{ adresse_form.as_p }}
         </div>
-    {% endif %}
 
-    <!-- Formulaire pour professionnel -->
-    {% if profileType == 'Professionnel' %}
-        <div id="pro_form">
-            {{ pro_form.as_p }}
-            <h3>Informations sur le diplôme</h3>
-            {{ quality_form.as_p }}
-        </div>
-    {% endif %}
+
 
     <button type="submit">S'inscrire</button>
 </form>

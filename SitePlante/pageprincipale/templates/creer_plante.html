@@ -1,0 +1,11 @@
+{% extends "pagedebase.html" %}
+{% block title %}Créer une plante{% endblock %}
+{% block content %}
+<br><br><br><br>
+    <h1>Créer une nouvelle plante</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Créer</button>
+    </form>
+{% endblock %}

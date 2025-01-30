@@ -17,18 +17,27 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth import login
 from django.urls import path
-from pageprincipale.views import index
-
+from pageprincipale.views import index, faire_demande,demande_aide,demande, interactiv_map
+from django.conf import settings
+from django.conf.urls.static import static
 
 from django.contrib import admin
 from django.urls import path
 from pageprincipale.views import index
 from django.contrib import admin
 from django.urls import path
-from pageprincipale.views import index,login,register
+from pageprincipale.views import index,login,register,profil,creer_plante,research_pro
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
     path('login/', login, name='login'),
-    path('register/',register,name="register")
-]
+    path('register/',register,name="register"),
+    path('profil/', profil, name='profil'),
+    path('contact_pro/', research_pro, name='pro'),
+    path('creer_plante/', creer_plante, name='creer_plante'),
+    path('faire_demande/',faire_demande,name='faire_demande'),
+    path('demande/',demande,name='demande'),
+    path('demande_aide/<int:id>/',demande_aide,name='demande_aide'),
+    path('interactiv-map/', interactiv_map, name='interactiv-map')
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
