@@ -32,7 +32,7 @@ class ModelsTestCase(TestCase):
         self.assertEqual(Plante.objects.count(), 1)
         self.assertEqual(plante.nom_plante, "Rosier")
         self.assertEqual(plante.utilisateur.pseudo, "User1")
-    
+
     # Test la création d'une demande + vérifie sa relation avec une plante, un utilisateur et un type de demande
     def test_create_demande(self):
         adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
@@ -42,8 +42,8 @@ class ModelsTestCase(TestCase):
         demande = Demande.objects.create(plante=plante, utilisateur=utilisateur, type_demande=type_demande, date_demande=timezone.now())
         self.assertEqual(Demande.objects.count(), 1)
         self.assertEqual(str(demande), f"Demande de {utilisateur} pour {plante}")
-    
-    
+
+
     # Test la création d'un message + vérifie que son texte est correctement enregistré
     def test_create_message(self):
         adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
@@ -51,7 +51,7 @@ class ModelsTestCase(TestCase):
         message = Message.objects.create(User=utilisateur, text="Test Message")
         self.assertEqual(Message.objects.count(), 1)
         self.assertEqual(message.text, "Test Message")
-    
+
     # Test la création d'un commentaire + vérifie qu'il est bien associé à un message et un utilisateur
     def test_create_commentaire(self):
         adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
@@ -60,3 +60,113 @@ class ModelsTestCase(TestCase):
         commentaire = Commentaire.objects.create(demande=message, User=utilisateur, text="Test Message")
         self.assertEqual(Commentaire.objects.count(), 1)
         self.assertEqual(commentaire.text, "Test Message")
+
+
+from django.test import TestCase, Client
+from django.urls import reverse
+from .models import Utilisateur, Plante, Demande_plante, Adresse, Message
+
+class ViewsModelsFormsTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.adresse = Adresse.objects.create(
+            numero=123,
+            voie='Rue de Test',
+            ville='Testville',
+            code_postale=12345
+        )
+        self.utilisateur = Utilisateur.objects.create(
+            pseudo='testuser',
+            password='password123',
+            adresse=self.adresse
+        )
+        self.plante = Plante.objects.create(
+            nom_plante='Test Plante',
+            utilisateur=self.utilisateur
+        )
+        self.demande_plante = Demande_plante.objects.create(
+            plante=self.plante,
+            utilisateur_demandeur=self.utilisateur,
+            statut='en attente'
+        )
+
+    def login_user(self):
+        self.client.post(reverse('login'), {'pseudo': 'testuser', 'password': 'password123'})
+
+    def test_login_view_post(self):
+        response = self.client.post(reverse('login'), {'pseudo': 'testuser', 'password': 'password123'})
+        self.assertIn(reverse('index'), response.headers.get('Location', ''))
+
+    def test_creer_plante_view_post(self):
+        self.login_user()
+        form_data = {'nom_plante': 'Nouvelle Plante'}
+        response = self.client.post(reverse('creer_plante'), data=form_data)
+        self.assertIn(reverse('profil'), response.headers.get('Location', ''))
+
+    def test_register_view_post(self):
+        form_data = {
+            'uc-pseudo': 'newuser',
+            'uc-password': 'newpassword123',
+            'numero': 456,
+            'voie': 'Rue de Exemple',
+            'ville': 'Exempleville',
+            'code_postale': 67890
+        }
+        response = self.client.post(reverse('register'), data=form_data)
+
+
+    def test_faire_demande_view_post(self):
+        self.login_user()
+        form_data = {'plante': self.plante.id_plante, 'message': 'Test message'}
+        response = self.client.post(reverse('faire_demande'), data=form_data)
+        self.assertIn(reverse('profil'), response.headers.get('Location', ''))
+
+    def test_demande_view_post(self):
+        self.login_user()
+        form_data = {'text': 'Test message'}
+        response = self.client.post(reverse('demande'), data=form_data)
+        self.assertIn('demande', response.headers.get('Location', ''))
+
+    def test_demande_aide_view_post(self):
+        self.login_user()
+        message = Message.objects.create(User=self.utilisateur, text='Test message')
+        form_data = {'text': 'Test commentaire'}
+        response = self.client.post(reverse('demande_aide', args=[message.id_message]), data=form_data)
+        self.assertIn('demande_aide', response.headers.get('Location', ''))
+
+    def test_all_demande_garde_view_post(self):
+        self.login_user()
+        demande = Demande_plante.objects.create(
+            plante=self.plante,
+            utilisateur_demandeur=self.utilisateur,
+            statut='en attente'
+        )
+        form_data = {'demande_id': demande.id}
+        response = self.client.post(reverse('all_demande_garde'), data=form_data)
+        self.assertIn('logged_user', response.context)
+        self.assertIn('Demandes', response.context)
+
+    def test_garde_view_post(self):
+        self.login_user()
+        demande = Demande_plante.objects.create(
+            plante=self.plante,
+            utilisateur_demandeur=self.utilisateur,
+            statut='en attente'
+        )
+        form_data = {'photo': '', 'text': 'Test garde'}
+        response = self.client.post(reverse('garde', args=[demande.id]), data=form_data)
+        self.assertIn('logged_user', response.context)
+        self.assertIn('form', response.context)
+        self.assertIn('message_images', response.context)
+
+    def test_interactiv_map_view(self):
+        self.login_user()
+        response = self.client.get(reverse('interactiv-map'))
+        self.assertIn('logged_user', response.context)
+        self.assertIn('markers_json', response.context)
+
+    def test_research_pro_view(self):
+        self.login_user()
+        response = self.client.get(reverse('pro'))
+        self.assertIn('logged_user', response.context)
+        self.assertIn('user_pro', response.context)
