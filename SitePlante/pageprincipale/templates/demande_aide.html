@@ -3,7 +3,7 @@
 <br><br><br><br><br>
 {% if message.photo %}
             <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
-            <img src="{{ message.photo.url}}">
+            <img src="{{ message.photo.url}}" class="maxImgW">
             <p>Posté par {{ message.User.pseudo }} {% if message.User.is_pro == True %}
             🪴
     {% endif %} le {{ message.date_demande }}

@@ -14,7 +14,7 @@
     </form>
 {% for message in message_images %}
 {% if message.photo%}
-<img src="{{ message.photo.url }}">
+<img src="{{ message.photo.url }}" class="maxImgW">
 {% endif %}
 <p> {{message.text}} , message de l'utilisateur {{logged_user.pseudo}}</p>
 <br><hr><br>
