@@ -32,6 +32,8 @@ class Utilisateur(models.Model):
     pseudo = models.CharField(max_length=255)  # Pseudo
     password = models.CharField(max_length=255)  # Mot de passe
     adresse = models.ForeignKey(Adresse, on_delete=models.CASCADE)  # Clé étrangère vers Adresse
+    longitude = models.FloatField(null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
     REQUIRED_FIELDS = ['password']
     USERNAME_FIELD = 'pseudo'
     def __str__(self):
@@ -77,9 +79,6 @@ class Demande_plante(models.Model):
     message=models.CharField(max_length=255,null=True)
     date_demande = models.DateTimeField(auto_now_add=True)
     date_reponse = models.DateTimeField(null=True, blank=True)
-    photo_plante1 = models.ImageField(upload_to='photos_plantes/', blank=True, null=True)
-    photo_plante2 = models.ImageField(upload_to='photos_plantes/', blank=True, null=True)
-    photo_plante3 = models.ImageField(upload_to='photos_plantes/', blank=True, null=True)
 
     def __str__(self):
         return f"Demande pour {self.plante.nom_plante} par {self.utilisateur_demandeur.pseudo}"

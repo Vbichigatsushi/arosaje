@@ -1,0 +1,14 @@
+{% extends "pagedebase.html" %} {% load static %} {% block title %}Carte
+intéractive{% endblock %} {% block content %}
+
+<br /><br /><br />
+
+<div id="map"></div>
+
+<script>
+  const markersData = JSON.parse("{{ markers_json|escapejs }}");
+</script>
+
+<script type="text/javascript" src="{% static 'script/map.js' %}"></script>
+
+{% endblock %}

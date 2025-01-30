@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.contrib.auth import login
 from django.urls import path
 from pageprincipale.views import index, faire_demande,demande_aide,demande,all_demande_garde,garde
+from pageprincipale.views import index, faire_demande,demande_aide,demande, interactiv_map
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -38,6 +39,7 @@ urlpatterns = [
     path('faire_demande/',faire_demande,name='faire_demande'),
     path('demande/',demande,name='demande'),
     path('demande_aide/<int:id>/',demande_aide,name='demande_aide'),
+    path('interactiv-map/', interactiv_map, name='interactiv-map'),
     path('all_demande_garde/', all_demande_garde, name='all_demande_garde'),
     path('garde/<int:id>/',garde,name='garde'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

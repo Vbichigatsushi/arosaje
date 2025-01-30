@@ -1,5 +1,6 @@
 
 
+from .models import Plante
 from django import forms
 from pageprincipale.models import Utilisateur, Plante, Adresse, Demande_plante, Message, Commentaire,MessageImage
 
@@ -28,7 +29,7 @@ class AdressForm(forms.ModelForm):
 class UserNormalProfileForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        exclude = ['adresse']  # Exclure le champ 'adresse'
+        exclude = ['adresse','longitude','latitude']  # Exclure le champ 'adresse'
 
 
 
