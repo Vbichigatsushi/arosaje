@@ -306,7 +306,8 @@ def garde(request,id):
             form = GardeForm(request.POST, request.FILES)
             if form.is_valid():
                 messagephoto = form.save(commit=False)
-                messagephoto.Demande = Demande_plante.objects.get(id=id) # Associer l'utilisateur connecté
+                messagephoto.Demande = Demande_plante.objects.get(id=id)
+                messagephoto.utilisateur=logged_user
                 messagephoto.save()
                 message_images = MessageImage.objects.filter(Demande=Demande_plante.objects.get(id=id))
                 return render(request, 'garde.html',

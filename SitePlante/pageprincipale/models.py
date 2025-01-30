@@ -100,3 +100,4 @@ class MessageImage(models.Model):
     Demande = models.ForeignKey('Demande_plante',on_delete=models.CASCADE)
     text=text=models.CharField(max_length=250, blank=True, null=True)
     photo = models.ImageField(upload_to='photos_plantes/', blank=True, null=True)
+    utilisateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE,null=True, blank=True)

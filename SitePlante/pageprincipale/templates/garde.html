@@ -16,7 +16,7 @@
 {% if message.photo%}
 <img src="{{ message.photo.url }}" class="maxImgW">
 {% endif %}
-<p> {{message.text}} , message de l'utilisateur {{logged_user.pseudo}}</p>
+<p> {{message.text}} , message de l'utilisateur {{message.utilisateur.pseudo}}</p>
 <br><hr><br>
 {% endfor %}
 {% endblock %}
