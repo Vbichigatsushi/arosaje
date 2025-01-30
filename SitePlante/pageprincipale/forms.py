@@ -1,6 +1,3 @@
-
-
-from .models import Plante
 from django import forms
 from pageprincipale.models import Utilisateur, Plante, Adresse, Demande_plante, Message, Commentaire,MessageImage
 
@@ -41,11 +38,6 @@ class PlanteForm(forms.ModelForm):
             'nom_plante': forms.TextInput(attrs={'class': 'form-control'}),
             'photo_plante': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
-
-
-from django import forms
-from .models import Demande_plante, Plante
-
 
 class DemandeForm(forms.ModelForm):
     class Meta:

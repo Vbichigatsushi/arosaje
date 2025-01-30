@@ -1,19 +1,12 @@
 from sys import prefix
-
 import requests
 from django.shortcuts import render, redirect
 from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm, \
     CommentaireForm, GardeForm,CommentaireForm,MessageImage
 from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
-
-from pageprincipale.forms import LoginForm,UserNormalProfileForm,AdressForm,PlanteForm,DemandeForm
-from .models import Utilisateur, Plante, Demande_plante
-
 import json
 from .forms import UserNormalProfileForm
 import urllib.parse
-from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm,CommentaireForm,CommentaireForm
-from .models import Utilisateur, Plante, Demande_plante, Message
 
 
 def get_logged_form_request(request):
@@ -92,10 +85,6 @@ def geocode_address(address):
     else:
         print(f"Erreur de l'API: {response.status_code}")
         return None, None
-
-from django.shortcuts import render, redirect
-from .forms import UserNormalProfileForm
-
 
 def creer_plante(request):
     logged_user = get_logged_form_request(request)
