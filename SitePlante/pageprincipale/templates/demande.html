@@ -12,7 +12,6 @@
 <ul>
     {% for message in messages %}
         <li>{% if message.photo %}
-                    <img src="{{ plante.photo_plante.url }}">
             <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
             <img src="{{ message.photo.url}}" alt="{{ message.nom }}">
             <p>Posté par {{ message.User.pseudo }}  {% if message.User.is_pro == True %}

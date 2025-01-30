@@ -2,7 +2,7 @@
 
 from .models import Plante
 from django import forms
-from pageprincipale.models import Utilisateur, Plante, Adresse, Demande_plante, Message, Commentaire
+from pageprincipale.models import Utilisateur, Plante, Adresse, Demande_plante, Message, Commentaire,MessageImage
 
 
 class LoginForm(forms.Form):
@@ -29,7 +29,7 @@ class AdressForm(forms.ModelForm):
 class UserNormalProfileForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        exclude = ['adresse', 'latitude','longitude']  # Exclure le champ 'adresse'
+        exclude = ['adresse','longitude','latitude']  # Exclure le champ 'adresse'
 
 
 
@@ -77,3 +77,8 @@ class CommentaireForm(forms.ModelForm):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             self.fields['text'].widget = forms.Textarea(attrs={'rows': 4, 'placeholder': 'Entrez votre commentaire'})
+
+class GardeForm(forms.ModelForm):
+    class Meta:
+        model = MessageImage
+        fields = ['photo','text']

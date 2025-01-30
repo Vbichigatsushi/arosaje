@@ -32,7 +32,7 @@ class Utilisateur(models.Model):
     pseudo = models.CharField(max_length=255)  # Pseudo
     password = models.CharField(max_length=255)  # Mot de passe
     adresse = models.ForeignKey(Adresse, on_delete=models.CASCADE)  # Clé étrangère vers Adresse
-    longitude = models.FloatField(null=True, blank=True) 
+    longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     REQUIRED_FIELDS = ['password']
     USERNAME_FIELD = 'pseudo'
@@ -61,6 +61,7 @@ class Demande(models.Model):
     def __str__(self):
         return f"Demande de {self.utilisateur} pour {self.plante}"
 
+
 class Demande_plante(models.Model):
     plante = models.ForeignKey('Plante', on_delete=models.CASCADE)
     utilisateur_demandeur = models.ForeignKey(
@@ -68,6 +69,7 @@ class Demande_plante(models.Model):
     )
     utilisateur_receveur = models.ForeignKey(
         Utilisateur, on_delete=models.SET_NULL, related_name='demandes_recues', null=True, blank=True
+
     )  # Par défaut, aucun receveur
     statut = models.CharField(
         max_length=20,
@@ -93,3 +95,8 @@ class Commentaire(models.Model):
     User = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
     text = models.TextField()
     date_creation = models.DateTimeField(auto_now_add=True)
+
+class MessageImage(models.Model):
+    Demande = models.ForeignKey('Demande_plante',on_delete=models.CASCADE)
+    text=text=models.CharField(max_length=250, blank=True, null=True)
+    photo = models.ImageField(upload_to='photos_plantes/', blank=True, null=True)

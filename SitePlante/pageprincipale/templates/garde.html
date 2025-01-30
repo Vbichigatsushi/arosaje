@@ -1,0 +1,22 @@
+{% extends "pagedebase.html" %}
+{% block content %}
+<br><br><br><br>
+<h1>Liste des demandes d'aide</h1>
+<br><br>
+<h1>Annonce entre {{Demande.utilisateur_demandeur}} et {{Demande.utilisateur_receveur}} </h1>
+<h2>Photo des visites: </h2>
+<h3>Ajouter une photo :</h3>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Créer</button>
+    </form>
+{% for message in message_images %}
+{% if message.photo%}
+<img src="{{ message.photo.url }}">
+{% endif %}
+<p> {{message.text}} , message de l'utilisateur {{logged_user.pseudo}}</p>
+<br><hr><br>
+{% endfor %}
+{% endblock %}

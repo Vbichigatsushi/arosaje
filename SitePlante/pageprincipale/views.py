@@ -1,6 +1,10 @@
+from sys import prefix
 
 import requests
 from django.shortcuts import render, redirect
+from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm, \
+    CommentaireForm, GardeForm,CommentaireForm,MessageImage
+from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
 
 from pageprincipale.forms import LoginForm,UserNormalProfileForm,AdressForm,PlanteForm,DemandeForm
 from .models import Utilisateur, Plante, Demande_plante
@@ -25,9 +29,11 @@ def get_logged_form_request(request):
 def profil(request):
     logged_user = get_logged_form_request(request)
     plantes_utilisateur = Plante.objects.filter(utilisateur=logged_user)
+    Demande_demander=Demande_plante.objects.filter(utilisateur_demandeur=logged_user)
+    Demande_receveur = Demande_plante.objects.filter(utilisateur_receveur=logged_user)
     if logged_user:
         # Passe l'utilisateur connecté au template
-        return render(request, 'profil.html', {'logged_user': logged_user,'plantes_utilisateur': plantes_utilisateur})
+        return render(request, 'profil.html', {'Demande_demandeur':Demande_demander,'logged_user': logged_user,'plantes_utilisateur': plantes_utilisateur,'Demande_receveur': Demande_receveur})
 
     else:
         # Redirige vers la page de connexion si non connecté
@@ -65,12 +71,12 @@ def geocode_address(address):
     address_encoded = urllib.parse.quote(address)
     url = f"https://nominatim.openstreetmap.org/search?format=json&q={address_encoded}"
     headers = {
-        'User-Agent': 'SitePlante/1.0 (mailto:SitePlante@test.com)'  
+        'User-Agent': 'SitePlante/1.0 (mailto:SitePlante@test.com)'
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         try:
-            
+
             data = response.json()
             if data:
                 lat_str = data[0].get('lat')
@@ -87,6 +93,9 @@ def geocode_address(address):
         print(f"Erreur de l'API: {response.status_code}")
         return None, None
 
+from django.shortcuts import render, redirect
+from .forms import UserNormalProfileForm
+
 
 def creer_plante(request):
     logged_user = get_logged_form_request(request)
@@ -105,30 +114,12 @@ def creer_plante(request):
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
-    
-def creer_plante(request):
-    logged_user = get_logged_form_request(request)
-    if logged_user:
-        if request.method == 'POST':
-            form = PlanteForm(request.POST, request.FILES)
-            if form.is_valid():
-                plante = form.save(commit=False)
-                plante.utilisateur = logged_user  # Associer l'utilisateur connecté
-                plante.save()
-                return redirect('profil')  # Rediriger vers la page profil ou autre page
-        else:
-            form = PlanteForm()
-
-        return render(request, 'creer_plante.html', {'form': form})
-    else:
-        # Redirige vers la page de connexion si non connecté
-        return redirect('login')
-    
 def register(request):
-    profile_type = None 
+    profile_type = None  # Valeur par défaut pour éviter les erreurs
     if request.method == 'POST' and 'profileType' in request.POST:
         profile_type = request.POST['profileType']
 
+        # Formulaires
         userclassique_form = UserNormalProfileForm(request.POST, prefix="uc")
         adresse_form = AdressForm(request.POST)
 
@@ -137,25 +128,26 @@ def register(request):
                 adresse = adresse_form.save()
                 address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France"
                 lat, lon = geocode_address(address)
-                
+
                 if lat is not None and lon is not None:
                     user = userclassique_form.save(commit=False)
                     user.adresse = adresse
                     user.latitude = lat
                     user.longitude = lon
                     user.save()
-                    
+
                     return redirect('login')
-                
+
                 else:
                     adresse_form.add_error(None, "Erreur de géocodage.")
                     return render(request, 'register.html', {
                       'userclassique_form': userclassique_form,
                       'adresse_form': adresse_form,
-                      'profileType': profile_type  # 
+                      'profileType': profile_type  #
                 })
-              
+
             else:
+                # Si le formulaire est invalide, afficher les erreurs
                 return render(request, 'register.html', {
                     'userclassique_form': userclassique_form,
                     'adresse_form': adresse_form,
@@ -211,7 +203,7 @@ def faire_demande(request):
     else:
         # Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
         return redirect('login')
-    
+
 def interactiv_map(request):
     logged_user = get_logged_form_request(request)
     if logged_user:
@@ -230,15 +222,15 @@ def interactiv_map(request):
                 'nom': plante_nom,
                 'latitude': lat,
                 'longitude':lon
-                
+
             })
         markers_json = json.dumps(markers)  # Sérialisation en JSON
         return render(request, 'interactiv-map.html', {
-            'logged_user': logged_user, 
-            'markers_json': markers_json  
+            'logged_user': logged_user,
+            'markers_json': markers_json
         })
     else:
-        
+
         return redirect('login')
 
 def research_pro(request):
@@ -296,6 +288,46 @@ def demande_aide(request,id):
         reponses = message.commentaires.all().order_by('-date_creation')
         return render(request, 'demande_aide.html',
                       {'logged_user': logged_user, 'message': message, 'reponses': reponses,'form':form})
+    else:
+        # Redirige vers la page de connexion si non connecté
+        return redirect('login')
+
+def all_demande_garde(request):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        if request.method == "POST":
+            demande_id = request.POST.get("demande_id")
+            demande=Demande_plante.objects.get(id=demande_id)
+            if demande.utilisateur_receveur is None:
+
+                demande.utilisateur_receveur = logged_user
+                demande.statut = "acceptée"
+                demande.save()
+        Demandes = Demande_plante.objects.order_by('-date_demande')
+        return render(request, 'all_demande_garde.html',
+                      {'logged_user': logged_user, 'Demandes': Demandes})
+    else:
+        return redirect('login')
+
+def garde(request,id):
+    logged_user = get_logged_form_request(request)
+    form= GardeForm(request.POST)
+    if logged_user:
+        if request.method == 'POST':
+            form = GardeForm(request.POST, request.FILES)
+            if form.is_valid():
+                messagephoto = form.save(commit=False)
+                messagephoto.Demande = Demande_plante.objects.get(id=id) # Associer l'utilisateur connecté
+                messagephoto.save()
+                message_images = MessageImage.objects.filter(Demande=Demande_plante.objects.get(id=id))
+                return render(request, 'garde.html',
+                              {'logged_user': logged_user, 'form': form, 'message_images':message_images,'id':id})
+        else :
+            form = GardeForm()
+            Demande = Demande_plante.objects.get(id=id)
+            message_images = MessageImage.objects.filter(Demande=Demande)
+            return render(request, 'garde.html',
+                      {'logged_user': logged_user, 'Demande': Demande,'form':form,'message_images':message_images})
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
