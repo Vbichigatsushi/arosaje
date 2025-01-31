@@ -1,9 +1,11 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.utils import timezone
 from pageprincipale.models import TypeDemande, Adresse, Utilisateur, Plante, Demande, Demande_plante, Message, Commentaire, MessageImage
+from django.urls import reverse
+
+
 
 # Create your tests here.
-
 class ModelsTestCase(TestCase):
   # Test la création d'un type demande + vérifie que le nom est correctement enregistré
     def test_create_type_demande(self):
@@ -61,10 +63,6 @@ class ModelsTestCase(TestCase):
         self.assertEqual(Commentaire.objects.count(), 1)
         self.assertEqual(commentaire.text, "Test Message")
 
-
-from django.test import TestCase, Client
-from django.urls import reverse
-from .models import Utilisateur, Plante, Demande_plante, Adresse, Message
 
 class ViewsModelsFormsTestCase(TestCase):
     def setUp(self):
