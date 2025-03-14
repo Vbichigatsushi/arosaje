@@ -32,6 +32,7 @@ jobs:
         coverage xml
 
   sonarQubeScan:
+    needs: unittest
     name: sonarQubeScan
     runs-on: ubuntu-latest
     
