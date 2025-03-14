@@ -1,0 +1,25 @@
+{% extends "pagedebase.html" %} {% load static %} {% block title %}Liste des
+Plantes{% endblock %} {% block content %}
+
+<br /><br /><br />
+
+<h3 id="plantes-dispo">Gardes disponibles dans un rayon de 500 mètres:</h3>
+
+<div
+  id="plantes-list"
+  class="plantes-container"
+  style="display: flex; flex-wrap: wrap; gap: 1rem"
+></div>
+
+<div
+  id="no-data-message"
+  style="display: none; color: red; margin-bottom: 1rem"
+></div>
+
+<script>
+  const markersData = JSON.parse("{{ markers_json|escapejs }}");
+</script>
+
+<script type="text/javascript" src="{% static 'script/plant.js' %}"></script>
+
+{% endblock %}

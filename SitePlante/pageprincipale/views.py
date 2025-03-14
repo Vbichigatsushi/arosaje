@@ -59,32 +59,6 @@ def login(request):
         form =LoginForm()
         return render(request,'login.html',{'form':form})
 
-# def geocode_address(address):
-#     address_encoded = urllib.parse.quote(address)
-#     url = f"https://nominatim.openstreetmap.org/search?format=json&q={address_encoded}"
-#     headers = {
-#         'User-Agent': 'SitePlante/1.0 (mailto:SitePlante@test.com)'
-#     }
-#     response = requests.get(url, headers=headers)
-#     if response.status_code == 200:
-#         try:
-
-#             data = response.json()
-#             if data:
-#                 lat_str = data[0].get('lat')
-#                 lon_str = data[0].get('lon')
-#                 if lat_str and lon_str:
-#                     lat = float(lat_str)
-#                     lon = float(lon_str)
-#                     return lat, lon
-#             return None, None
-#         except ValueError:
-#             print("Erreur lors du décodage JSON.")
-#             return None, None
-#     else:
-#         print(f"Erreur de l'API: {response.status_code}")
-#         return None, None
-
 def geocode_address(address):
     address_encoded = urllib.parse.quote(address)
     url = f"https://api-adresse.data.gouv.fr/search/?q={address_encoded}&limit=1"
@@ -97,17 +71,6 @@ def geocode_address(address):
             return lat, lon
     print(f"Erreur de l'API: {response.status_code}")
     return None, None
-
-# def filter_nearby_addresses(reference_point, addresses, max_distance=0.5):
-#     nearby = []
-#     for address in addresses:
-#         user_point = (address.latitude, address.longitude)
-#         distance = haversine(reference_point, user_point, unit=Unit.KILOMETERS)
-#         if distance <= max_distance:
-#             nearby.append(address)
-#     return nearby
-
-
 
 def creer_plante(request):
     logged_user = get_logged_form_request(request)
@@ -216,79 +179,61 @@ def faire_demande(request):
         # Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
         return redirect('login')
 
-# def interactiv_map(request):
-#     logged_user = get_logged_form_request(request)
-#     if logged_user:
-#         demandes = Demande_plante.objects.select_related('utilisateur_demandeur__adresse').all()
-#         markers = []
-#         for demande in demandes:
-#             adresse = demande.utilisateur_demandeur.adresse
-#             full_address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France"
-#             plante_nom = demande.plante.nom_plante if demande.plante else "Nom de la plante non disponible"
-#             lat = demande.utilisateur_demandeur.latitude
-#             lon = demande.utilisateur_demandeur.longitude
-#             markers.append({
-#                 'id': demande.id,
-#                 'adresse': full_address,
-#                 'pseudo': demande.utilisateur_demandeur.pseudo,
-#                 'nom': plante_nom,
-#                 'latitude': lat,
-#                 'longitude':lon
 
-#             })
-#         markers_json = json.dumps(markers)  # Sérialisation en JSON
-#         return render(request, 'interactiv-map.html', {
-#             'logged_user': logged_user,
-#             'markers_json': markers_json
-#         })
-#     else:
+def get_demandes_with_marker_info(logged_user):
+    demandes = Demande_plante.objects.select_related('utilisateur_demandeur').all()
+    markers = []
 
-#         return redirect('login')
+    user_coords = (logged_user.latitude, logged_user.longitude)
+    if not all(user_coords):
+        return markers 
+
+    for demande in demandes:
+        adresse = demande.utilisateur_demandeur.adresse
+        adresse_coords = (demande.utilisateur_demandeur.latitude, demande.utilisateur_demandeur.longitude)
+        if all(adresse_coords):
+            distance = haversine(user_coords, adresse_coords, unit=Unit.METERS)
+            if distance <= 500:  
+                full_address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France" if adresse else "Adresse non disponible"
+                plante_nom = demande.plante.nom_plante if demande.plante else "Nom de la plante non disponible"
+                lat = demande.utilisateur_demandeur.latitude
+                lon = demande.utilisateur_demandeur.longitude
+                markers.append({
+                    'id': demande.id,
+                    'adresse': full_address,
+                    'pseudo': demande.utilisateur_demandeur.pseudo,
+                    'nom': plante_nom,
+                    'latitude': lat,
+                    'longitude': lon,
+                    'distance': distance
+                })
+    
+    return markers
+
+def filtered_garde_liste(request):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+        markers = get_demandes_with_marker_info(logged_user)
+        if not markers:
+            return render(request, 'filtered-garde-liste.html', {'message': 'Aucune demande dans les environs.'})
+        
+        markers_json = json.dumps(markers)
+        return render(request, 'filtered-garde-liste.html', {'markers_json': markers_json})
+    else:
+        return redirect('login')
 
 def interactiv_map(request):
     logged_user = get_logged_form_request(request)
     if logged_user:
-        demandes = Demande_plante.objects.select_related('utilisateur_demandeur').all() 
-        markers = []
-
-        user_coords = (logged_user.latitude, logged_user.longitude)
-
-        if not all(user_coords):
-            return render(request, 'interactiv-map.html', {
-                'error': 'Coordonnées utilisateur indisponibles.',
-            })
-
-        for demande in demandes:
-            adresse = demande.utilisateur_demandeur.adresse
-            
-            adresse_coords = (demande.utilisateur_demandeur.latitude, demande.utilisateur_demandeur.longitude)
-
-
-            if all(adresse_coords):
-                distance = haversine(user_coords, adresse_coords, unit=Unit.METERS)
-                if distance <= 500:
-                    full_address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France" if adresse else "Adresse non disponible"
-                    plante_nom = demande.plante.nom_plante if demande.plante else "Nom de la plante non disponible"
-                    lat = demande.utilisateur_demandeur.latitude
-                    lon = demande.utilisateur_demandeur.longitude
-                    markers.append({
-                        'id': demande.id,
-                        'adresse': full_address,
-                        'pseudo': demande.utilisateur_demandeur.pseudo,
-                        'nom': plante_nom,
-                        'latitude': lat,
-                        'longitude': lon,
-                        'distance': distance
-                    })
-
+        markers = get_demandes_with_marker_info(logged_user)
         markers_json = json.dumps(markers)  # Sérialisation en JSON
+        
         return render(request, 'interactiv-map.html', {
             'logged_user': logged_user,
             'markers_json': markers_json
         })
     else:
         return redirect('login')
-
 
 def research_pro(request):
     logged_user = get_logged_form_request(request)
