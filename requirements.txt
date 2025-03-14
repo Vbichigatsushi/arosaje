@@ -4,6 +4,7 @@ charset-normalizer==3.4.1
 coverage==7.6.12
 Django==5.1.7
 dotenv==0.9.9
+haversine==2.9.0
 idna==3.10
 pillow==11.1.0
 python-dotenv==1.0.1
