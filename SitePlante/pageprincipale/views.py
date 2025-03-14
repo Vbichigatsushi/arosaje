@@ -7,7 +7,7 @@ from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
 import json
 from .forms import UserNormalProfileForm
 import urllib.parse
-
+from haversine import haversine, Unit
 
 def get_logged_form_request(request):
     if 'logged_user_id' in request.session:
@@ -59,32 +59,53 @@ def login(request):
         form =LoginForm()
         return render(request,'login.html',{'form':form})
 
+# def geocode_address(address):
+#     address_encoded = urllib.parse.quote(address)
+#     url = f"https://nominatim.openstreetmap.org/search?format=json&q={address_encoded}"
+#     headers = {
+#         'User-Agent': 'SitePlante/1.0 (mailto:SitePlante@test.com)'
+#     }
+#     response = requests.get(url, headers=headers)
+#     if response.status_code == 200:
+#         try:
+
+#             data = response.json()
+#             if data:
+#                 lat_str = data[0].get('lat')
+#                 lon_str = data[0].get('lon')
+#                 if lat_str and lon_str:
+#                     lat = float(lat_str)
+#                     lon = float(lon_str)
+#                     return lat, lon
+#             return None, None
+#         except ValueError:
+#             print("Erreur lors du décodage JSON.")
+#             return None, None
+#     else:
+#         print(f"Erreur de l'API: {response.status_code}")
+#         return None, None
 
 def geocode_address(address):
     address_encoded = urllib.parse.quote(address)
-    url = f"https://nominatim.openstreetmap.org/search?format=json&q={address_encoded}"
-    headers = {
-        'User-Agent': 'SitePlante/1.0 (mailto:SitePlante@test.com)'
-    }
-    response = requests.get(url, headers=headers)
+    url = f"https://api-adresse.data.gouv.fr/search/?q={address_encoded}&limit=1"
+    response = requests.get(url)
     if response.status_code == 200:
-        try:
+        data = response.json()
+        if data.get('features'):
+            geometry = data['features'][0]['geometry']
+            lon, lat = geometry['coordinates']
+            return lat, lon
+    print(f"Erreur de l'API: {response.status_code}")
+    return None, None
 
-            data = response.json()
-            if data:
-                lat_str = data[0].get('lat')
-                lon_str = data[0].get('lon')
-                if lat_str and lon_str:
-                    lat = float(lat_str)
-                    lon = float(lon_str)
-                    return lat, lon
-            return None, None
-        except ValueError:
-            print("Erreur lors du décodage JSON.")
-            return None, None
-    else:
-        print(f"Erreur de l'API: {response.status_code}")
-        return None, None
+def filter_nearby_addresses(reference_point, addresses, max_distance=0.5):
+    nearby = []
+    for address in addresses:
+        user_point = (address.latitude, address.longitude)
+        distance = haversine(reference_point, user_point, unit=Unit.KILOMETERS)
+        if distance <= max_distance:
+            nearby.append(address)
+    return nearby
 
 def creer_plante(request):
     logged_user = get_logged_form_request(request)
@@ -115,7 +136,7 @@ def register(request):
         if profile_type == 'Classiq_User':  # Si utilisateur classique
             if userclassique_form.is_valid() and adresse_form.is_valid():
                 adresse = adresse_form.save()
-                address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France"
+                address = f"{adresse.numero} {adresse.voie} {adresse.ville}"
                 lat, lon = geocode_address(address)
 
                 if lat is not None and lon is not None:

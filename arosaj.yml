@@ -1,0 +1,6 @@
+services:
+  webapp:
+    image: arosajimg 
+    --- dire de créer l'image(s) et de l'utiliser ---
+    ports:
+      - 8000:8000
