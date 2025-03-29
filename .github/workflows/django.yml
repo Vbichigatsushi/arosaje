@@ -30,7 +30,7 @@ jobs:
 
     - name: Run Migrations
       run: |
-        docker-compose -f arosaj.yml exec web python manage.py migrate
+        docker-compose -f arosaj.yml exec -e SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }} web python manage.py migrate
 
 
   unittest:
