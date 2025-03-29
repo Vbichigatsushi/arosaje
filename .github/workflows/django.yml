@@ -61,12 +61,12 @@ jobs:
         docker ps
 
     - name: Run Tests with Coverage
-      run: docker exec $(docker ps -qf "name=arosaje_container") coverage run manage.py test
+      run: docker exec -d arosaje_container coverage run manage.py test
 
     - name: Generate and Copy Coverage Report
       run: |
-        docker exec $(docker ps -qf "name=arosaje_container") coverage xml
-        docker cp $(docker ps -qf "name=arosaje_container"):/app/coverage.xml .
+        docker exec -d arosaje_container coverage xml
+        docker cp arosaje_container:/app/coverage.xml .
 
     - name: Upload Coverage Report
       uses: actions/upload-artifact@v4
