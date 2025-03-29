@@ -66,7 +66,7 @@ jobs:
     - name: Generate and Copy Coverage Report
       run: |
         docker exec -d arosaje_container coverage xml
-        docker cp arosaje_container:/app/coverage.xml .
+        docker cp arosaje_container:/app/SitePlante/coverage.xml .
 
     - name: Upload Coverage Report
       uses: actions/upload-artifact@v4
