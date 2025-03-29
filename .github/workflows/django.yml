@@ -24,8 +24,8 @@ jobs:
       env:
         SECRET_KEY_DJANGO: ${{ secrets.SECRET_KEY_DJANGO }}
 
-    - name: Wait for Services to be Ready
-      run: sleep 5
+    - name: List Docker Containers
+      run: docker ps
 
     - name: Run Migrations
       run: docker exec $(docker ps -qf "name=web") python manage.py migrate
