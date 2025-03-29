@@ -25,11 +25,8 @@ jobs:
 
     - name: Run Migrations
       run: |
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }}" >> $GITHUB_ENV
         docker-compose -f arosaj.yml exec -T -e SECRET_KEY="${{ secrets.SECRET_KEY_DJANGO }}" web python manage.py migrate
-
-    - name: Check SECRET_KEY
-      run: docker-compose -f arosaj.yml exec web echo $SECRET_KEY
-
 
   unittest:
     needs: build
