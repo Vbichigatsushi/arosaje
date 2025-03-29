@@ -23,8 +23,11 @@ jobs:
         sudo chmod +x /usr/local/bin/docker-compose
         docker-compose --version
 
-    - name: Build and Run Docker Container
-      run: docker-compose -f arosaj.yml build -d
+    - name: Build Docker Container
+      run: docker-compose -f arosaj.yml build
+
+    - name : Docker Image
+      run: docker image
 
     - name: Save Docker Image to Tarball
       run: docker save -o arosaje_web.tar arosaje_web
