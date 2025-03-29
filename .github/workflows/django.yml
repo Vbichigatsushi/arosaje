@@ -5,13 +5,11 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: djangoEnv
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
-
-    - name: Set environment variables
-      run: echo "SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }}" >> $GITHUB_ENV
 
     - name: Set up Docker
       uses: docker/setup-buildx-action@v2
@@ -25,20 +23,9 @@ jobs:
     - name: Build and Run Docker Container
       run: docker-compose -f arosaj.yml up -d --build
 
-    - name: List Docker Containers
-      run: docker ps
-
     - name: Run Migrations
       run: |
-        echo "SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }}"
-        if [ -z "${{ secrets.SECRET_KEY_DJANGO }}" ]; then
-          echo "SECRET_KEY is not set or empty, exiting."
-          exit 1
-        fi
         docker-compose -f arosaj.yml exec -T -e SECRET_KEY="${{ secrets.SECRET_KEY_DJANGO }}" web python manage.py migrate
-
-
-
 
   unittest:
     needs: build
