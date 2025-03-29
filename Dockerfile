@@ -5,6 +5,13 @@ WORKDIR /app
 
 ENV SECRET_KEY=""
 
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
+USER nonroot
+
+ENTRYPOINT ["/app"]
+
 RUN pip install -r requirements.txt
 
 WORKDIR /app/SitePlante
