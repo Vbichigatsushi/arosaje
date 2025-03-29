@@ -31,11 +31,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: djangoEnv
     services:
-    docker:
-      image: arosaje_web
-      options: --entrypoint /bin/sh
-      ports:
-        - 8000:8000
+      docker:
+        image: arosaje_web
+        options: --entrypoint /bin/sh
+        ports:
+          - 8000:8000
 
     steps:
     - name: Checkout Repository
