@@ -30,7 +30,13 @@ jobs:
 
     - name: Run Migrations
       run: |
-        docker-compose -f arosaj.yml exec -e SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }} web python manage.py migrate
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }}"
+        if [ -z "${{ secrets.SECRET_KEY_DJANGO }}" ]; then
+          echo "SECRET_KEY is not set or empty, exiting."
+          exit 1
+        fi
+        docker-compose -f arosaj.yml exec -T -e SECRET_KEY="${{ secrets.SECRET_KEY_DJANGO }}" web python manage.py migrate
+
 
 
 
