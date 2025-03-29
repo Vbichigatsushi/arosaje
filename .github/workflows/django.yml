@@ -28,9 +28,11 @@ jobs:
       run: docker ps
 
     - name: Run Migrations
-      run: docker exec $(docker ps -qf "ancestor=arosaje_web") python manage.py migrate
+      run: |
+        docker-compose -f arosaj.yml exec web python manage.py migrate
       env:
         SECRET_KEY_DJANGO: ${{ secrets.SECRET_KEY_DJANGO }}
+
 
   unittest:
     needs: build
