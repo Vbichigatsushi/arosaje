@@ -58,7 +58,6 @@ jobs:
     - name: Run docker image
       run: |
         docker run -d --name arosaje_container arosaje_web
-        docker start arosaje_container
         docker ps
 
     - name: Run Tests with Coverage
