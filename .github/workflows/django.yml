@@ -55,14 +55,16 @@ jobs:
     
     steps:
       - name: Checkout Repository
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Download coverage report
         uses: actions/download-artifact@v4
         with:
           name: coverage-report
           path: .
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
         env:
