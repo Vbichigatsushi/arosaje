@@ -63,15 +63,17 @@ jobs:
     - name: Run Tests with Coverage
       run: docker exec -d arosaje_container coverage run manage.py test
 
-    - name: Generate and Copy Coverage Report
-      run: |
-        docker exec -d arosaje_container coverage xml
+    - name: Generate Coverage Report
+      run: docker exec arosaje_container coverage xml
+
+    - name: Copy Coverage Report from Container
+      run: docker cp arosaje_container:/app/SitePlante/coverage.xml .
 
     - name: Upload Coverage Report
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
-        path: ./coverage.xml
+        path: coverage.xml
 
   sonarQubeScan:
     needs: unittest
