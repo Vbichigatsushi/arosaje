@@ -24,12 +24,18 @@ jobs:
         docker-compose --version
 
     - name: Build and Run Docker Container
-      run: docker-compose -f arosaj.yml up -d --build
+      run: docker-compose -f arosaj.yml build -d
 
   unittest:
     needs: build
     runs-on: ubuntu-latest
     environment: djangoEnv
+    services:
+    docker:
+      image: arosaje_web
+      options: --entrypoint /bin/sh
+      ports:
+        - 8000:8000
 
     steps:
     - name: Checkout Repository
