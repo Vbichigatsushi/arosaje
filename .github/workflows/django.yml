@@ -57,7 +57,7 @@ jobs:
 
     - name: Run docker image
       run: |
-        docker run -d --name arosaje_container arosaje_web
+        docker run -d --name arosaje_container -e SECRET_KEY="${{ secrets.SECRET_KEY_DJANGO }}" arosaje_web
         docker ps
 
     - name: Run Tests with Coverage
