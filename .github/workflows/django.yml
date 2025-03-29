@@ -30,6 +30,11 @@ jobs:
         cd SitePlante
         coverage run manage.py test
         coverage xml
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: SitePlante/coverage.xml
 
   sonarQubeScan:
     needs: unittest
@@ -39,14 +44,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+      - name: Download coverage report
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage-report
+          path: SitePlante
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # analysis token associated to your project
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         with:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.sources=.
+            -Dsonar.python.coverage.reportPaths=SitePlante/coverage.xml
