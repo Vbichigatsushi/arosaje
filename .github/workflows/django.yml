@@ -28,7 +28,7 @@ jobs:
 
     - name: Run Migrations
       run: |
-        docker-compose -f arosaj.yml exec web python manage.py migrate
+        docker-compose -f arosaj.yml exec web python manage.py migrate --verbosity 3
 
   unittest:
     needs: build
