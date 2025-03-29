@@ -26,10 +26,6 @@ jobs:
     - name: Build and Run Docker Container
       run: docker-compose -f arosaj.yml up -d --build
 
-    - name: Run Migrations
-      run: |
-        docker-compose -f arosaj.yml exec web python manage.py migrate --verbosity 3
-
   unittest:
     needs: build
     runs-on: ubuntu-latest
