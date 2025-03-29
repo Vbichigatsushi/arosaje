@@ -61,7 +61,7 @@ jobs:
         docker ps
 
     - name: Run Tests with Coverage
-      run: docker exec -d arosaje_container coverage run manage.py test
+      run: docker exec arosaje_container coverage run manage.py test
 
     - name: Generate Coverage Report
       run: docker exec arosaje_container coverage xml
