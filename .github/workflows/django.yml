@@ -55,13 +55,17 @@ jobs:
     - name: Load Docker Image from Tarball
       run: docker load -i arosaje_web.tar
 
+    - name: Run docker image
+      run: docker run -d --name arosaje_container arosaje_web
+
+
     - name: Run Tests with Coverage
-      run: docker exec $(docker ps -qf "ancestor=arosaje_web") coverage run manage.py test
+      run: docker exec $(docker ps -qf "name=arosaje_container") coverage run manage.py test
 
     - name: Generate and Copy Coverage Report
       run: |
-        docker exec $(docker ps -qf "ancestor=arosaje_web") coverage xml
-        docker cp $(docker ps -qf "ancestor=arosaje_web"):/app/coverage.xml .
+        docker exec $(docker ps -qf "name=arosaje_container") coverage xml
+        docker cp $(docker ps -qf "name=arosaje_container"):/app/coverage.xml .
 
     - name: Upload Coverage Report
       uses: actions/upload-artifact@v4
