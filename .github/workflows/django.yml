@@ -26,23 +26,31 @@ jobs:
     - name: Build and Run Docker Container
       run: docker-compose -f arosaj.yml build -d
 
+    - name: Save Docker Image to Tarball
+      run: docker save -o arosaje_web.tar arosaje_web
+
+    - name: Upload Docker Image Tarball
+      uses: actions/upload-artifact@v4
+      with:
+        name: arosaje_web_image
+        path: arosaje_web.tar
+
   unittest:
     needs: build
     runs-on: ubuntu-latest
     environment: djangoEnv
-    services:
-      docker:
-        image: arosaje_web
-        options: --entrypoint /bin/sh
-        ports:
-          - 8000:8000
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Run Tests with Coverage
-      run: docker ps
+    - name: Download Docker Image Tarball
+      uses: actions/download-artifact@v4
+      with:
+        name: arosaje_web_image
+
+    - name: Load Docker Image from Tarball
+      run: docker load -i arosaje_web.tar
 
     - name: Run Tests with Coverage
       run: docker exec $(docker ps -qf "ancestor=arosaje_web") coverage run manage.py test
