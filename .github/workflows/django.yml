@@ -56,8 +56,9 @@ jobs:
       run: docker load -i arosaje_web.tar
 
     - name: Run docker image
-      run: docker run -d --name arosaje_container arosaje_web
-
+      run: |
+        docker run -d --name arosaje_container arosaje_web
+        docker ps
 
     - name: Run Tests with Coverage
       run: docker exec $(docker ps -qf "name=arosaje_container") coverage run manage.py test
