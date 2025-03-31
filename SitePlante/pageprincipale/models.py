@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 
 
+from django.core.exceptions import ValidationError
 
 class TypeDemande(models.Model):
     id_type_demande = models.AutoField(primary_key=True)  # ID du type de demande
@@ -34,8 +35,13 @@ class Utilisateur(models.Model):
     adresse = models.ForeignKey(Adresse, on_delete=models.CASCADE)  # Clé étrangère vers Adresse
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
+    rgpd_accepted =  models.BooleanField(default=False)
     REQUIRED_FIELDS = ['password']
     USERNAME_FIELD = 'pseudo'
+
+    def clean(self):
+        if not self.rgpd_accepted:
+            raise ValidationError('Vous devez accepter les conditions RGPD.')
     def __str__(self):
         return self.pseudo
 
@@ -49,18 +55,6 @@ class Plante(models.Model):
 
     def __str__(self):
         return self.nom_plante
-class Demande(models.Model):
-    plante = models.ForeignKey(Plante, on_delete=models.CASCADE)  # Clé étrangère vers Plante
-    utilisateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)  # Clé étrangère vers Utilisateur
-    type_demande = models.ForeignKey(TypeDemande, on_delete=models.CASCADE)  # Clé étrangère vers TypeDemande
-    date_demande = models.DateTimeField()  # Date de la demande
-
-    class Meta:
-        unique_together = (("plante", "utilisateur", "type_demande"))  # Clé primaire composite
-
-    def __str__(self):
-        return f"Demande de {self.utilisateur} pour {self.plante}"
-
 
 class Demande_plante(models.Model):
     plante = models.ForeignKey('Plante', on_delete=models.CASCADE)

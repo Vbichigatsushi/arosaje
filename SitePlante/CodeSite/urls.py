@@ -17,8 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth import login
 from django.urls import path
-from pageprincipale.views import index, faire_demande,demande_aide,demande,all_demande_garde,garde
-from pageprincipale.views import index, faire_demande,demande_aide,demande, interactiv_map
+from pageprincipale.views import index, faire_demande,demande_aide,demande,all_demande_garde,garde,rgpd,suppression,supprimer
+from pageprincipale.views import index, faire_demande,demande_aide,demande, interactiv_map,supprimer_plante,supprimer_demande
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -42,4 +42,9 @@ urlpatterns = [
     path('interactiv-map/', interactiv_map, name='interactiv-map'),
     path('all_demande_garde/', all_demande_garde, name='all_demande_garde'),
     path('garde/<int:id>/',garde,name='garde'),
+    path('supprimer_plante/<int:id_plante>/', supprimer_plante, name='supprimer_plante'),
+    path('supprimer_demande/<int:demande_id>/', supprimer_demande, name='supprimer_demande'),
+    path('rgpd',rgpd, name='rgpd'),
+    path('suppression',suppression, name='suppression'),
+    path('supprimer', supprimer, name='supprimer'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
