@@ -28,6 +28,13 @@ from pageprincipale.views import index
 from django.contrib import admin
 from django.urls import path
 from pageprincipale.views import index,login,register,profil,creer_plante,research_pro
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
@@ -42,4 +49,7 @@ urlpatterns = [
     path('interactiv-map/', interactiv_map, name='interactiv-map'),
     path('all_demande_garde/', all_demande_garde, name='all_demande_garde'),
     path('garde/<int:id>/',garde,name='garde'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
