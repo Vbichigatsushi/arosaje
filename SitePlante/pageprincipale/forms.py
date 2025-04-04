@@ -42,7 +42,7 @@ class UserNormalProfileForm(forms.ModelForm):
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
-        password_pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*-]).{8,}$"
+        password_pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*-]).{12,}$"
 
         if not password:
             raise forms.ValidationError("Le mot de passe est requis.")

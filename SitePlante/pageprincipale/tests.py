@@ -85,7 +85,7 @@ class ViewsModelsFormsTestCase(TestCase):
         )
         self.utilisateur = Utilisateur.objects.create(
             pseudo='testuser',
-            password='password123',
+            password='Password123!',
             adresse=self.adresse
         )
         self.plante = Plante.objects.create(
@@ -99,10 +99,10 @@ class ViewsModelsFormsTestCase(TestCase):
         )
 
     def login_user(self):
-        self.client.post(reverse('login'), {'pseudo': 'testuser', 'password': 'password123'})
+        self.client.post(reverse('login'), {'pseudo': 'testuser', 'password': 'Password123!'})
 
     def test_login_view_post(self):
-        response = self.client.post(reverse('login'), {'pseudo': 'testuser', 'password': 'password123'})
+        response = self.client.post(reverse('login'), {'pseudo': 'testuser', 'password': 'Password123!'})
         self.assertIn(reverse('index'), response.headers.get('Location', ''))
 
     def test_creer_plante_view_post(self):
@@ -114,7 +114,7 @@ class ViewsModelsFormsTestCase(TestCase):
     def test_register_view_post(self):
         form_data = {
             'uc-pseudo': 'newuser',
-            'uc-password': 'newpassword123',
+            'uc-password': 'Password123!',
             'numero': 456,
             'voie': 'Rue de Exemple',
             'ville': 'Exempleville',
