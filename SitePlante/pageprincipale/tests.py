@@ -22,14 +22,14 @@ class ModelsTestCase(TestCase):
     # Test la création d'un utilisateur + que le pseudo est bien enregistré
     def test_create_utilisateur(self):
         adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
-        utilisateur = Utilisateur.objects.create(pseudo="User1", password="test", adresse=adresse)
+        utilisateur = Utilisateur.objects.create(pseudo="User1", password="Password123!", adresse=adresse)
         self.assertEqual(Utilisateur.objects.count(), 1)
         self.assertEqual(utilisateur.pseudo, "User1")
 
     # Test la création d'une plante + vérifie qu'elle est bien associée à un utilisateur
     def test_create_plante(self):
         adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
-        utilisateur = Utilisateur.objects.create(pseudo="User1", password="test", adresse=adresse)
+        utilisateur = Utilisateur.objects.create(pseudo="User1", password="Password123!", adresse=adresse)
         plante = Plante.objects.create(nom_plante="Rosier", utilisateur=utilisateur)
         self.assertEqual(Plante.objects.count(), 1)
         self.assertEqual(plante.nom_plante, "Rosier")
@@ -40,8 +40,8 @@ class ModelsTestCase(TestCase):
 
 def test_create_demande_plante(self):
     adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
-    utilisateur_demandeur = Utilisateur.objects.create(pseudo="User1", password="test", adresse=adresse)
-    utilisateur_receveur = Utilisateur.objects.create(pseudo="User2", password="test", adresse=adresse)
+    utilisateur_demandeur = Utilisateur.objects.create(pseudo="User1", password="Password123!", adresse=adresse)
+    utilisateur_receveur = Utilisateur.objects.create(pseudo="User2", password="Password123!", adresse=adresse)
     plante = Plante.objects.create(nom_plante="Tulipe", utilisateur=utilisateur_demandeur)
 
     demande = Demande_plante.objects.create(
@@ -59,7 +59,7 @@ def test_create_demande_plante(self):
     # Test la création d'un message + vérifie que son texte est correctement enregistré
     def test_create_message(self):
         adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
-        utilisateur = Utilisateur.objects.create(pseudo="Messager", password="secret", adresse=adresse)
+        utilisateur = Utilisateur.objects.create(pseudo="Messager", password="Password123!", adresse=adresse)
         message = Message.objects.create(User=utilisateur, text="Test Message")
         self.assertEqual(Message.objects.count(), 1)
         self.assertEqual(message.text, "Test Message")
@@ -67,7 +67,7 @@ def test_create_demande_plante(self):
     # Test la création d'un commentaire + vérifie qu'il est bien associé à un message et un utilisateur
     def test_create_commentaire(self):
         adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
-        utilisateur = Utilisateur.objects.create(pseudo="User1", password="test", adresse=adresse)
+        utilisateur = Utilisateur.objects.create(pseudo="User1", password="Password123!", adresse=adresse)
         message = Message.objects.create(User=utilisateur, text="Test Message")
         commentaire = Commentaire.objects.create(demande=message, User=utilisateur, text="Test Message")
         self.assertEqual(Commentaire.objects.count(), 1)
