@@ -1,5 +1,3 @@
-// retirer de la liste les demandes acceptées (pour ne plus tere proposées)
-
 const plantesList = document.querySelector("#plantes-list");
 const messageContainer = document.querySelector("#no-data-message");
 
@@ -14,8 +12,6 @@ if (markersData.length === 0) {
   const filteredMarkers = markersData.filter(
     (marker) => marker.statut !== "acceptée"
   );
-
-  console.log(filteredMarkers);
 
   filteredMarkers.forEach((marker) => {
     const card = document.createElement("div");

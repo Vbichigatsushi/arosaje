@@ -10,8 +10,6 @@ let vegetableIcon = L.icon({
   popupAnchor: [1, 1],
 });
 
-console.log(markersData);
-
 markersData.forEach(async function (markerData) {
   try {
     const { latitude, longitude, adresse, pseudo, nom } = markerData;
