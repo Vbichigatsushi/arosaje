@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth import login
 from django.urls import path
+from pageprincipale.views import index, faire_demande,demande_aide,demande,all_demande_garde,garde,rgpd,suppression,supprimer
+from pageprincipale.views import index, faire_demande,demande_aide,demande, interactiv_map,supprimer_plante,supprimer_demande
 from pageprincipale.views import index, faire_demande,demande_aide,demande, interactiv_map, filtered_garde_liste, all_demande_garde,garde
 from django.conf import settings
 from django.conf.urls.static import static
@@ -27,6 +29,13 @@ from pageprincipale.views import index
 from django.contrib import admin
 from django.urls import path
 from pageprincipale.views import index,login,register,profil,creer_plante,research_pro
+
+from pageprincipale.views import liste_plantes
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -43,4 +52,14 @@ urlpatterns = [
     path('filtered-garde-liste/', filtered_garde_liste, name='filtered-garde-liste'),
     path('all_demande_garde/', all_demande_garde, name='all_demande_garde'),
     path('garde/<int:id>/',garde,name='garde'),
+    path('supprimer_plante/<int:id_plante>/', supprimer_plante, name='supprimer_plante'),
+    path('supprimer_demande/<int:demande_id>/', supprimer_demande, name='supprimer_demande'),
+    path('rgpd',rgpd, name='rgpd'),
+    path('suppression',suppression, name='suppression'),
+    path('supprimer', supprimer, name='supprimer'),
+    path('plantes/', liste_plantes),  # Accessible à http://172.25.1.90:8000/plantes/
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

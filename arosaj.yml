@@ -1,6 +1,7 @@
+version: '3.8'
+
 services:
-  webapp:
-    image: arosajimg 
-    --- dire de créer l'image(s) et de l'utiliser ---
+  web:
+    build: .
     ports:
-      - 8000:8000
+      - "8000:8000"

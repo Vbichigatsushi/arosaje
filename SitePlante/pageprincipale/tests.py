@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from django.utils import timezone
-from pageprincipale.models import TypeDemande, Adresse, Utilisateur, Plante, Demande, Demande_plante, Message, Commentaire, MessageImage
+from pageprincipale.models import TypeDemande, Adresse, Utilisateur, Plante, Demande_plante, Message, Commentaire, MessageImage
 from django.urls import reverse
 
 
@@ -35,15 +35,25 @@ class ModelsTestCase(TestCase):
         self.assertEqual(plante.nom_plante, "Rosier")
         self.assertEqual(plante.utilisateur.pseudo, "User1")
 
-    # Test la création d'une demande + vérifie sa relation avec une plante, un utilisateur et un type de demande
-    def test_create_demande(self):
-        adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
-        utilisateur = Utilisateur.objects.create(pseudo="User1", password="test", adresse=adresse)
-        plante = Plante.objects.create(nom_plante="Tulipe", utilisateur=utilisateur)
-        type_demande = TypeDemande.objects.create(nom_type_demande="Echange")
-        demande = Demande.objects.create(plante=plante, utilisateur=utilisateur, type_demande=type_demande, date_demande=timezone.now())
-        self.assertEqual(Demande.objects.count(), 1)
-        self.assertEqual(str(demande), f"Demande de {utilisateur} pour {plante}")
+
+
+
+def test_create_demande_plante(self):
+    adresse = Adresse.objects.create(numero=1, voie="Place du Maréchal Leclerc", ville="Auxerre", code_postale=89000)
+    utilisateur_demandeur = Utilisateur.objects.create(pseudo="User1", password="test", adresse=adresse)
+    utilisateur_receveur = Utilisateur.objects.create(pseudo="User2", password="test", adresse=adresse)
+    plante = Plante.objects.create(nom_plante="Tulipe", utilisateur=utilisateur_demandeur)
+
+    demande = Demande_plante.objects.create(
+        plante=plante,
+        utilisateur_demandeur=utilisateur_demandeur,
+        utilisateur_receveur=utilisateur_receveur,
+        statut='en attente',
+        message="Je souhaite échanger cette plante."
+    )
+
+    self.assertEqual(Demande_plante.objects.count(), 1)
+    self.assertEqual(str(demande), f"Demande pour {plante.nom_plante} par {utilisateur_demandeur.pseudo}")
 
 
     # Test la création d'un message + vérifie que son texte est correctement enregistré

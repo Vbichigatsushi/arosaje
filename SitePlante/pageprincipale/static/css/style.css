@@ -192,20 +192,20 @@ textarea {
   resize: none;
 }
 
-button {
+button, #buttonConnection {
   padding-top: 50px;
   padding-bottom: 50px;
   padding: 1rem 2rem;
   background-color: white;
   color: #2c5a3f;
-  border: none;
+  border: 1px lightgray solid;
   border-radius: 5px;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-button:hover {
+button:hover, #buttonConnection:hover {
   background-color: #f0f0f0;
 }
 
@@ -283,6 +283,43 @@ footer {
   padding: 2rem;
 }
 
+#formConnection, #formRegister {
+  background: white;
+  color: black;
+  padding: 40px 20px;
+  border-radius: 25px;
+  width: 35dvw;
+}
+
+#formConnection > p, #formRegister p {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#formRegister p {
+  margin-top: 10px;
+}
+
+#formConnection > p:nth-child(4){
+  margin-top: 20px;
+  flex-direction: column;
+}
+
+#formConnection > p:nth-child(4) > a{
+  font-size: 16px;
+}
+
+#formRegister > div > p:nth-child(1) > #id_uc-is_pro{
+  margin-right: 8dvw;
+}
+
+#formRegister > div > h3:nth-child(4) {
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   nav {
@@ -303,5 +340,9 @@ footer {
 
   .hero p {
     font-size: 1.2rem;
+  }
+
+  #formConnection, #formRegister {
+    width: 90dvw;
   }
 }

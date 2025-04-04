@@ -6,12 +6,13 @@
     <h1>Création d'un compte</h1>
 
     <!-- Menu déroulant pour sélectionner le type de profil -->
-   <form method="POST" action="{% url 'register' %}">
+   <form method="POST" action="{% url 'register' %}" id="formRegister">
     {% csrf_token %}
 <input type="hidden" name="profileType" value="Classiq_User">
     <!-- Formulai&erre pour utilisateur classique -->
         <div id="classique_user_form">
             {{ userclassique_form.as_p }}
+            <a href="{% url 'rgpd'%}"><p>Reglement RGPD </p> </a>
             <h3>Informations sur l'adresse</h3>
             {{ adresse_form.as_p }}
         </div>

@@ -130,7 +130,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
-.envDjango2
+/.envDjango2/
 env/
 venv/
 ENV/

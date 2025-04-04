@@ -1,20 +1,28 @@
 from django import forms
 from pageprincipale.models import Utilisateur, Plante, Adresse, Demande_plante, Message, Commentaire,MessageImage
+import re
 
 
 class LoginForm(forms.Form):
-    pseudo=forms.CharField(label='Pseudo')
-    password=forms.CharField(label='Mot de passe',widget=forms.PasswordInput)
+    pseudo = forms.CharField(label='Pseudo')
+    password = forms.CharField(label='Mot de passe', widget=forms.PasswordInput)
 
     def clean(self):
-        cleaned_data= super (LoginForm,self).clean()
-        pseudo =cleaned_data.get('pseudo')
-        password=cleaned_data.get('password')
+        cleaned_data = super().clean()
+        pseudo = cleaned_data.get('pseudo')
+        password = cleaned_data.get('password')
 
         if pseudo and password:
-            result=Utilisateur.objects.filter(password=password,pseudo=pseudo)
-            if len(result) != 1:
-                raise forms.ValidationError("Adresse de courriel ou mot de passe erroné(e)")
+            try:
+                user = Utilisateur.objects.get(pseudo=pseudo)
+
+                if not user.check_password(password):
+                    raise forms.ValidationError("Pseudo ou mot de passe incorrect.")
+
+            except Utilisateur.DoesNotExist:
+                raise forms.ValidationError("Pseudo ou mot de passe incorrect.")
+
+        return cleaned_data
 
 
 class AdressForm(forms.ModelForm):
@@ -23,10 +31,27 @@ class AdressForm(forms.ModelForm):
         fields = '__all__'  # Inclut tous les champs du modèle
 
 
+import re
+from django import forms
+from .models import Utilisateur  # Assure-toi que ton modèle est bien importé
+
 class UserNormalProfileForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        exclude = ['adresse','longitude','latitude']  # Exclure le champ 'adresse'
+        exclude = ['adresse', 'longitude', 'latitude']
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        password_pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[#?!@$%^&*-]).{8,}$"
+
+        if not password:
+            raise forms.ValidationError("Le mot de passe est requis.")
+
+        if not re.match(password_pattern, password):
+            raise forms.ValidationError("Le mot de passe doit contenir au moins : "
+                                        "8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")
+
+        return password
 
 
 
