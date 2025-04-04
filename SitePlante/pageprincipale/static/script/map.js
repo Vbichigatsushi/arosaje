@@ -10,7 +10,7 @@ let vegetableIcon = L.icon({
   popupAnchor: [1, 1],
 });
 
-console.log("Données des marqueurs:", markersData);
+console.log(markersData);
 
 markersData.forEach(async function (markerData) {
   try {

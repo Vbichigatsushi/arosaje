@@ -180,24 +180,32 @@ def faire_demande(request):
         return redirect('login')
 
 
-def get_demandes_with_marker_info(logged_user):
-    demandes = Demande_plante.objects.select_related('utilisateur_demandeur').all()
-    markers = []
+def get_demandes_with_marker_info(logged_user, filter_by_receiver=False, only_accepted=False):
+    demandes = Demande_plante.objects.select_related('utilisateur_demandeur')
 
+    if filter_by_receiver:
+        demandes = demandes.filter(utilisateur_receveur=logged_user)
+
+    if only_accepted:
+        demandes = demandes.filter(statut="acceptée")
+
+    markers = []
     user_coords = (logged_user.latitude, logged_user.longitude)
     if not all(user_coords):
-        return markers 
+        return markers
 
     for demande in demandes:
         adresse = demande.utilisateur_demandeur.adresse
         adresse_coords = (demande.utilisateur_demandeur.latitude, demande.utilisateur_demandeur.longitude)
+
         if all(adresse_coords):
             distance = haversine(user_coords, adresse_coords, unit=Unit.METERS)
-            if distance <= 500:  
+            if distance <= 500:
                 full_address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France" if adresse else "Adresse non disponible"
                 plante_nom = demande.plante.nom_plante if demande.plante else "Nom de la plante non disponible"
                 lat = demande.utilisateur_demandeur.latitude
                 lon = demande.utilisateur_demandeur.longitude
+
                 markers.append({
                     'id': demande.id,
                     'adresse': full_address,
@@ -205,7 +213,10 @@ def get_demandes_with_marker_info(logged_user):
                     'nom': plante_nom,
                     'latitude': lat,
                     'longitude': lon,
-                    'distance': distance
+                    'distance': distance,
+                    'statut': demande.statut, 
+                    
+                    
                 })
     
     return markers
@@ -225,8 +236,12 @@ def filtered_garde_liste(request):
 def interactiv_map(request):
     logged_user = get_logged_form_request(request)
     if logged_user:
-        markers = get_demandes_with_marker_info(logged_user)
-        markers_json = json.dumps(markers)  # Sérialisation en JSON
+        markers = get_demandes_with_marker_info(
+            logged_user, 
+            filter_by_receiver=True, 
+            only_accepted=True
+        )
+        markers_json = json.dumps(markers)
         
         return render(request, 'interactiv-map.html', {
             'logged_user': logged_user,
@@ -268,8 +283,6 @@ def demande(request):
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
-
-
 
 
 def demande_aide(request,id):

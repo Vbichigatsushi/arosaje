@@ -49,6 +49,7 @@ class Plante(models.Model):
 
     def __str__(self):
         return self.nom_plante
+    
 class Demande(models.Model):
     plante = models.ForeignKey(Plante, on_delete=models.CASCADE)  # Clé étrangère vers Plante
     utilisateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)  # Clé étrangère vers Utilisateur
@@ -79,6 +80,7 @@ class Demande_plante(models.Model):
     message=models.CharField(max_length=255,null=True)
     date_demande = models.DateTimeField(auto_now_add=True)
     date_reponse = models.DateTimeField(null=True, blank=True)
+    est_acceptee = models.BooleanField(null=False, default=False )
 
     def __str__(self):
         return f"Demande pour {self.plante.nom_plante} par {self.utilisateur_demandeur.pseudo}"
