@@ -3,7 +3,16 @@ intéractive{% endblock %} {% block content %}
 
 <br /><br /><br />
 
-<div id="map"></div>
+<h3 id="plantes-dispo">Adresses des plantes à garder :</h3>
+
+<div
+  id="no-data-message"
+  style="display: none; color: red; margin-bottom: 1rem"
+></div>
+
+<div id="map-parent">
+  <div id="map"></div>
+</div>
 
 <script>
   const markersData = JSON.parse("{{ markers_json|escapejs }}");

@@ -209,14 +209,70 @@ button:hover, #buttonConnection:hover {
   background-color: #f0f0f0;
 }
 
-img.maxImgW{
+img.maxImgW {
   max-width: 75px;
   max-height: 75px;
 }
 
+#map-parent {
+  display: flex;
+  justify-content: center;
+}
+
 #map {
   height: 500px;
-  width: 100dvw;
+  width: 90dvw;
+  margin-top: 10px;
+}
+
+.plantes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.plante-card {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  width: calc(33.333% - 1rem);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.plante-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.plante-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.plante-card p {
+  margin: 0.3rem 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+#no-data-message {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+#plantes-dispo {
+  padding: 0 10px;
+  margin-bottom: 10px;
+}
+
+.plantes-container {
+  margin-bottom: 20px;
+  font-family: Arial, sans-serif;
+  padding: 0 10px;
 }
 
 /* Footer */

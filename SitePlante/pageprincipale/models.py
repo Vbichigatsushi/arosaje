@@ -29,11 +29,11 @@ class Adresse(models.Model):
 
 
 class Utilisateur(models.Model):
-    id_utilisateur = models.AutoField(primary_key=True)
-    is_pro = models.BooleanField(default=False)
-    pseudo = models.CharField(max_length=255, unique=True)  # Ajout de unique=True pour éviter les doublons
-    password = models.CharField(max_length=255)  # Stocke un mot de passe haché
-    adresse = models.ForeignKey("Adresse", on_delete=models.CASCADE)
+    id_utilisateur = models.AutoField(primary_key=True)  # ID de l'utilisateur
+    is_pro = models.BooleanField(default=False)  # Si l'utilisateur est professionnel
+    pseudo = models.CharField(max_length=255)  # Pseudo
+    password = models.CharField(max_length=255)  # Mot de passe
+    adresse = models.ForeignKey(Adresse, on_delete=models.CASCADE)  # Clé étrangère vers Adresse
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     rgpd_accepted = models.BooleanField(default=False)
@@ -80,7 +80,6 @@ class Demande_plante(models.Model):
     message=models.CharField(max_length=255,null=True)
     date_demande = models.DateTimeField(auto_now_add=True)
     date_reponse = models.DateTimeField(null=True, blank=True)
-
     def __str__(self):
         return f"Demande pour {self.plante.nom_plante} par {self.utilisateur_demandeur.pseudo}"
 

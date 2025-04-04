@@ -19,6 +19,7 @@ from django.contrib.auth import login
 from django.urls import path
 from pageprincipale.views import index, faire_demande,demande_aide,demande,all_demande_garde,garde,rgpd,suppression,supprimer
 from pageprincipale.views import index, faire_demande,demande_aide,demande, interactiv_map,supprimer_plante,supprimer_demande
+from pageprincipale.views import index, faire_demande,demande_aide,demande, interactiv_map, filtered_garde_liste, all_demande_garde,garde
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -48,6 +49,7 @@ urlpatterns = [
     path('demande/',demande,name='demande'),
     path('demande_aide/<int:id>/',demande_aide,name='demande_aide'),
     path('interactiv-map/', interactiv_map, name='interactiv-map'),
+    path('filtered-garde-liste/', filtered_garde_liste, name='filtered-garde-liste'),
     path('all_demande_garde/', all_demande_garde, name='all_demande_garde'),
     path('garde/<int:id>/',garde,name='garde'),
     path('supprimer_plante/<int:id_plante>/', supprimer_plante, name='supprimer_plante'),
