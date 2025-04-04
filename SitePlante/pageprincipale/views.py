@@ -59,18 +59,21 @@ def index(request):
 
 def login(request):
     logout(request)
-    if len(request.POST)>0:
-        form= LoginForm(request.POST)
+
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+
         if form.is_valid():
             user_pseudo = form.cleaned_data['pseudo']
-            logged_user= Utilisateur.objects.get(pseudo=user_pseudo)
-            request.session['logged_user_id']=logged_user.id_utilisateur
+            user = Utilisateur.objects.get(pseudo=user_pseudo)
+
+            request.session['logged_user_id'] = user.id_utilisateur
             return redirect('index')
-        else:
-            return render(request,'login.html',{'form':form})
-    else :
-        form =LoginForm()
-        return render(request,'login.html',{'form':form})
+
+    else:
+        form = LoginForm()
+
+    return render(request, 'login.html', {'form': form})
 
 
 def geocode_address(address):
@@ -131,55 +134,32 @@ def creer_plante(request):
         form = PlanteForm()
 
     return render(request, 'creer_plante.html', {'form': form})
-def register(request):
-    profile_type = None  # Valeur par défaut pour éviter les erreurs
-    if request.method == 'POST' and 'profileType' in request.POST:
-        profile_type = request.POST['profileType']
 
-        # Formulaires
+
+def register(request):
+    if request.method == 'POST':
         userclassique_form = UserNormalProfileForm(request.POST, prefix="uc")
         adresse_form = AdressForm(request.POST)
 
-        if profile_type == 'Classiq_User':  # Si utilisateur classique
-            if userclassique_form.is_valid() and adresse_form.is_valid():
-                adresse = adresse_form.save()
-                address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France"
-                lat, lon = geocode_address(address)
+        if userclassique_form.is_valid() and adresse_form.is_valid():
+            adresse = adresse_form.save()
+            user = userclassique_form.save(commit=False)
+            user.adresse = adresse
 
-                if lat is not None and lon is not None:
-                    user = userclassique_form.save(commit=False)
-                    user.adresse = adresse
-                    user.latitude = lat
-                    user.longitude = lon
-                    user.save()
+            # 🔐 Hachage du mot de passe
+            user.set_password(user.password)
+            user.save()
 
-                    return redirect('login')
+            return redirect('login')  # Redirige vers la page de connexion
 
-                else:
-                    adresse_form.add_error(None, "Erreur de géocodage.")
-                    return render(request, 'register.html', {
-                      'userclassique_form': userclassique_form,
-                      'adresse_form': adresse_form,
-                      'profileType': profile_type  #
-                })
-
-            else:
-                # Si le formulaire est invalide, afficher les erreurs
-                return render(request, 'register.html', {
-                    'userclassique_form': userclassique_form,
-                    'adresse_form': adresse_form,
-                    'profileType': profile_type  # Ajouter profileType au contexte
-                })
     else:
-        # Si c'est une requête GET, initialiser les formulaires et définir profileType à None
         userclassique_form = UserNormalProfileForm(prefix="uc")
         adresse_form = AdressForm()
 
-        return render(request, 'register.html', {
-            'userclassique_form': userclassique_form,
-            'adresse_form': adresse_form,
-            'profileType': profile_type  # Assurez-vous d'inclure profileType ici
-        })
+    return render(request, 'register.html', {
+        'userclassique_form': userclassique_form,
+        'adresse_form': adresse_form,
+    })
 
 
 def demandes(request):
@@ -383,3 +363,7 @@ def supprimer(request):
     user.delete()
     logout(request)
     return redirect('login')
+
+def liste_plantes(request):
+    plantes = Plante.objects.all().values()  # Récupère toutes les plantes sous forme de dictionnaire
+    return JsonResponse(list(plantes), safe=False)

@@ -28,6 +28,9 @@ from pageprincipale.views import index
 from django.contrib import admin
 from django.urls import path
 from pageprincipale.views import index,login,register,profil,creer_plante,research_pro
+
+from pageprincipale.views import liste_plantes
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
@@ -47,4 +50,6 @@ urlpatterns = [
     path('rgpd',rgpd, name='rgpd'),
     path('suppression',suppression, name='suppression'),
     path('supprimer', supprimer, name='supprimer'),
+    path('plantes/', liste_plantes),  # Accessible à http://172.25.1.90:8000/plantes/
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
