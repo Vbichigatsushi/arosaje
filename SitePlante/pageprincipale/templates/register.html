@@ -12,6 +12,7 @@
     <!-- Formulai&erre pour utilisateur classique -->
         <div id="classique_user_form">
             {{ userclassique_form.as_p }}
+            <a href="{% url 'rgpd'%}"><p>Reglement RGPD </p> </a>
             <h3>Informations sur l'adresse</h3>
             {{ adresse_form.as_p }}
         </div>

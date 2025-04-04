@@ -22,6 +22,11 @@
                 <img src="https://via.placeholder.com/150" alt="{{ plante.nom_plante }}">
                 {% endif %}
                 <h3>{{ plante.nom_plante }}</h3>
+                <!-- Formulaire de suppression -->
+                <form action="{% url 'supprimer_plante' plante.id_plante %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
             </div>
             {% empty %}
             <p>Vous n'avez pas encore ajouté de plantes.</p>
@@ -42,6 +47,10 @@
                 {% endif %}
 
                 <h3> {{ Demande.plante.nom_plante }}</h3></a>
+                <form action="{% url 'supprimer_demande' Demande.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
             </div>
             {% empty %}
             <p>Vous n'avez pas encore fait de demande de garde.</p>
@@ -64,5 +73,9 @@
             {% endfor %}
         </div>
     </section>
+         <form action="{% url 'suppression'%}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Supprimer compte</button>
+         </form>
     </main>
 {% endblock %}

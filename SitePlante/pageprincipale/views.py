@@ -1,14 +1,26 @@
 from sys import prefix
 import requests
-from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm, \
     CommentaireForm, GardeForm,CommentaireForm,MessageImage
 from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
 import json
 from .forms import UserNormalProfileForm
 import urllib.parse
+from django.contrib.auth import logout
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from .forms import PlanteForm
+from .utils.model_loader import load_model
+from .utils.image_predictor import predict_image
+import os
+from .models import Plante
+from PIL import Image
+from io import BytesIO
 
-
+model_path = os.path.join(os.path.dirname(__file__), 'models', 'mon_modele.h5')
+model = load_model(model_path)
 def get_logged_form_request(request):
     if 'logged_user_id' in request.session:
         logged_user_id = request.session['logged_user_id']
@@ -46,18 +58,22 @@ def index(request):
         return redirect('login')
 
 def login(request):
-    if len(request.POST)>0:
-        form= LoginForm(request.POST)
+    logout(request)
+
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+
         if form.is_valid():
             user_pseudo = form.cleaned_data['pseudo']
-            logged_user= Utilisateur.objects.get(pseudo=user_pseudo)
-            request.session['logged_user_id']=logged_user.id_utilisateur
+            user = Utilisateur.objects.get(pseudo=user_pseudo)
+
+            request.session['logged_user_id'] = user.id_utilisateur
             return redirect('index')
-        else:
-            return render(request,'login.html',{'form':form})
-    else :
-        form =LoginForm()
-        return render(request,'login.html',{'form':form})
+
+    else:
+        form = LoginForm()
+
+    return render(request, 'login.html', {'form': form})
 
 
 def geocode_address(address):
@@ -86,72 +102,64 @@ def geocode_address(address):
         print(f"Erreur de l'API: {response.status_code}")
         return None, None
 
+
 def creer_plante(request):
     logged_user = get_logged_form_request(request)
-    if logged_user:
-        if request.method == 'POST':
-            form = PlanteForm(request.POST, request.FILES)
-            if form.is_valid():
-                plante = form.save(commit=False)
-                plante.utilisateur = logged_user  # Associer l'utilisateur connecté
+
+    if not logged_user:
+        return redirect('login')  # Rediriger si non connecté
+
+    if request.method == 'POST':
+        form = PlanteForm(request.POST, request.FILES)
+        if form.is_valid():
+            plante = form.save(commit=False)
+            plante.utilisateur = logged_user  # Associer l'utilisateur connecté
+
+            # Récupérer l'objet ImageFieldFile
+            image_file = request.FILES['photo_plante']
+
+            # Vérifier si l'image est une plante
+            image = Image.open(BytesIO(image_file.read()))
+            target_size = (64, 64)  # Remplacez par la taille d'entrée de votre modèle
+            predictions = predict_image(model, image, target_size)
+            is_plant = predictions[0][0] > 0.5  # Remplacez par la logique de votre modèle
+
+            if is_plant:
                 plante.save()
-                return redirect('profil')  # Rediriger vers la page profil ou autre page
-        else:
-            form = PlanteForm()
-
-        return render(request, 'creer_plante.html', {'form': form})
+                return redirect('profil')  # Rediriger vers le profil
+            else:
+                form.add_error('photo_plante', 'L\'image téléchargée n\'est pas une plante.')
+                return render(request, 'creer_plante.html', {'form': form})
     else:
-        # Redirige vers la page de connexion si non connecté
-        return redirect('login')
-def register(request):
-    profile_type = None  # Valeur par défaut pour éviter les erreurs
-    if request.method == 'POST' and 'profileType' in request.POST:
-        profile_type = request.POST['profileType']
+        form = PlanteForm()
 
-        # Formulaires
+    return render(request, 'creer_plante.html', {'form': form})
+
+
+def register(request):
+    if request.method == 'POST':
         userclassique_form = UserNormalProfileForm(request.POST, prefix="uc")
         adresse_form = AdressForm(request.POST)
 
-        if profile_type == 'Classiq_User':  # Si utilisateur classique
-            if userclassique_form.is_valid() and adresse_form.is_valid():
-                adresse = adresse_form.save()
-                address = f"{adresse.numero} {adresse.voie}, {adresse.ville}, France"
-                lat, lon = geocode_address(address)
+        if userclassique_form.is_valid() and adresse_form.is_valid():
+            adresse = adresse_form.save()
+            user = userclassique_form.save(commit=False)
+            user.adresse = adresse
 
-                if lat is not None and lon is not None:
-                    user = userclassique_form.save(commit=False)
-                    user.adresse = adresse
-                    user.latitude = lat
-                    user.longitude = lon
-                    user.save()
+            # 🔐 Hachage du mot de passe
+            user.set_password(user.password)
+            user.save()
 
-                    return redirect('login')
+            return redirect('login')  # Redirige vers la page de connexion
 
-                else:
-                    adresse_form.add_error(None, "Erreur de géocodage.")
-                    return render(request, 'register.html', {
-                      'userclassique_form': userclassique_form,
-                      'adresse_form': adresse_form,
-                      'profileType': profile_type  #
-                })
-
-            else:
-                # Si le formulaire est invalide, afficher les erreurs
-                return render(request, 'register.html', {
-                    'userclassique_form': userclassique_form,
-                    'adresse_form': adresse_form,
-                    'profileType': profile_type  # Ajouter profileType au contexte
-                })
     else:
-        # Si c'est une requête GET, initialiser les formulaires et définir profileType à None
         userclassique_form = UserNormalProfileForm(prefix="uc")
         adresse_form = AdressForm()
 
-        return render(request, 'register.html', {
-            'userclassique_form': userclassique_form,
-            'adresse_form': adresse_form,
-            'profileType': profile_type  # Assurez-vous d'inclure profileType ici
-        })
+    return render(request, 'register.html', {
+        'userclassique_form': userclassique_form,
+        'adresse_form': adresse_form,
+    })
 
 
 def demandes(request):
@@ -321,3 +329,41 @@ def garde(request,id):
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
+
+
+def supprimer_plante(request, id_plante):
+    plante = get_object_or_404(Plante, id_plante=id_plante)
+    if request.method == 'POST':
+        plante.delete()
+    return redirect('profil')
+
+def supprimer_demande(request, demande_id):
+    demande = get_object_or_404(Demande_plante, id=demande_id)
+    if request.method == 'POST':
+        demande.delete()
+    return redirect('profil')
+
+def rgpd(request):
+    return render(request, 'rgpd.html',
+                  {})
+
+def suppression(request):
+    logged_user = get_logged_form_request(request)
+    if logged_user:
+
+
+        return render(request, 'suppression.html', {})
+    else:
+        # Redirige vers la page de connexion si non connecté
+        return redirect('login')
+
+def supprimer(request):
+    user = get_object_or_404(Utilisateur, id_utilisateur=request.session['logged_user_id'])
+
+    user.delete()
+    logout(request)
+    return redirect('login')
+
+def liste_plantes(request):
+    plantes = Plante.objects.all().values()  # Récupère toutes les plantes sous forme de dictionnaire
+    return JsonResponse(list(plantes), safe=False)
