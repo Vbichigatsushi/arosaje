@@ -129,28 +129,26 @@ def register(request):
         userclassique_form = UserNormalProfileForm(request.POST, prefix="uc")
         adresse_form = AdressForm(request.POST)
 
-        if profile_type == 'Classiq_User':  # Si utilisateur classique
-            if userclassique_form.is_valid() and adresse_form.is_valid():
-                adresse = adresse_form.save()
-                address = f"{adresse.numero} {adresse.voie} {adresse.ville}"
-                lat, lon = geocode_address(address)
+        if userclassique_form.is_valid() and adresse_form.is_valid():
+            adresse = adresse_form.save()
+            address = f"{adresse.numero} {adresse.voie} {adresse.ville}"
+            lat, lon = geocode_address(address)
+
+            if lat is not None and lon is not None:
+                user = userclassique_form.save(commit=False)
+                user.adresse = adresse
+                user.latitude = lat
+                user.longitude = lon
                 user.set_password(user.password)
+                user.save()
+                
+                return redirect('login')
 
-                if lat is not None and lon is not None:
-                    user = userclassique_form.save(commit=False)
-                    user.adresse = adresse
-                    user.latitude = lat
-                    user.longitude = lon
-                    user.save()
-                    
-                    return redirect('login')
-
-                else:
-                    adresse_form.add_error(None, "Erreur de géocodage.")
-                    return render(request, 'register.html', {
-                      'userclassique_form': userclassique_form,
-                      'adresse_form': adresse_form,
-                      'profileType': profile_type  #
+            else:
+                adresse_form.add_error(None, "Erreur de géocodage.")
+                return render(request, 'register.html', {
+                  'userclassique_form': userclassique_form,
+                  'adresse_form': adresse_form
                 })
 
     else:
