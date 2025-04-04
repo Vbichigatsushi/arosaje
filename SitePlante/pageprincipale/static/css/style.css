@@ -285,4 +285,8 @@ footer {
   .hero p {
     font-size: 1.2rem;
   }
+
+  #formConnection, #formRegister {
+    width: 90dvw;
+  }
 }
