@@ -6,7 +6,7 @@
     <h1>Création d'un compte</h1>
 
     <!-- Menu déroulant pour sélectionner le type de profil -->
-   <form method="POST" action="{% url 'register' %}">
+   <form method="POST" action="{% url 'register' %}" id="formRegister">
     {% csrf_token %}
 <input type="hidden" name="profileType" value="Classiq_User">
     <!-- Formulai&erre pour utilisateur classique -->

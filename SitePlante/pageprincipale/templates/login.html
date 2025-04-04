@@ -2,11 +2,12 @@
 {% block title %} login {% endblock %}
 {% block headerContent %}{% endblock %}
 {% block content %}<section id="accueil" class="hero">
-             <form method="post" action= "{% url 'login' %}" >
+            <h1>Connexion</h1>
+             <form method="post" action= "{% url 'login' %}" id="formConnection">
                 {% csrf_token %}
                 {{ form.as_p }}
                 <p>
-                    <input type="submit" value="Se connecter" />
+                    <input type="submit" value="Se connecter" id="buttonConnection"/>
                     <a href="{% url 'register' %}">Créer un compte</a>
                 </p>
             </form>
