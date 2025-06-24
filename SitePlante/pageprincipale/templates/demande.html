@@ -14,13 +14,13 @@
         <li>{% if message.photo %}
             <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
             <img src="{{ message.photo.url}}" alt="{{ message.nom }}" class="maxImgW">
-            <p>Posté par {{ message.User.pseudo }}  {% if message.User.is_pro == True %}
+            <p>Posté par {{ message.User.username }}  {% if message.User.is_pro == True %}
             🪴
     {% endif %}le {{ message.date_demande }}
             test</p>
             {% else %}
              <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
-            <p>Posté par {{ message.User.pseudo }}  {% if message.User.is_pro == True %}
+            <p>Posté par {{ message.User.username }}  {% if message.User.is_pro == True %}
             🪴
     {% endif %}le {{ message.date_demande }}
             test</p>

@@ -4,13 +4,13 @@
 {% if message.photo %}
             <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
             <img src="{{ message.photo.url}}" class="maxImgW">
-            <p>Posté par {{ message.User.pseudo }} {% if message.User.is_pro == True %}
+            <p>Posté par {{ message.User.username }} {% if message.User.is_pro == True %}
             🪴
     {% endif %} le {{ message.date_demande }}
             test</p>
             {% else %}
              <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
-            <p>Posté par {{ message.User.pseudo }}  {% if message.User.is_pro == True %}
+            <p>Posté par {{ message.User.username }}  {% if message.User.is_pro == True %}
             🪴
     {% endif %} le {{ message.date_demande }}
             </p>
@@ -20,7 +20,7 @@
 
         {% for reponse in reponses %}
         <p>
-            Commentaire par {{ reponse.User.pseudo }}  {% if reponse.User.is_pro == True %}
+            Commentaire par {{ reponse.User.username }}  {% if reponse.User.is_pro == True %}
         🪴
     {% endif %} le {{reponse.date_creation}} : {{reponse.text}}
         </p>

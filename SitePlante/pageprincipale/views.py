@@ -18,23 +18,17 @@ import os
 from .models import Plante
 from PIL import Image
 from io import BytesIO
-
+from django.contrib.auth import authenticate, login as auth_login, logout
+from django.shortcuts import render, redirect
+from .forms import LoginForm
 model_path = os.path.join(os.path.dirname(__file__), 'models', 'mon_modele.h5')
 model = load_model(model_path)
 from haversine import haversine, Unit
 
-def get_logged_form_request(request):
-    if 'logged_user_id' in request.session:
-        logged_user_id = request.session['logged_user_id']
-        try:
-            # Assurez-vous que vous utilisez l'ID, pas le nom d'utilisateur
-            return Utilisateur.objects.get(id_utilisateur=logged_user_id)
-        except Utilisateur.DoesNotExist:
-            return None
-    return None
+
 
 def profil(request):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     plantes_utilisateur = Plante.objects.filter(utilisateur=logged_user)
     Demande_demander=Demande_plante.objects.filter(utilisateur_demandeur=logged_user)
     Demande_receveur = Demande_plante.objects.filter(utilisateur_receveur=logged_user)
@@ -47,7 +41,7 @@ def profil(request):
         return redirect('login')
 
 def index(request):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     dernieres_demandes = (
         Demande_plante.objects.values('plante').order_by('-date_demande')[:3]
     )
@@ -66,11 +60,17 @@ def login(request):
         form = LoginForm(request.POST)
 
         if form.is_valid():
-            user_pseudo = form.cleaned_data['pseudo']
-            user = Utilisateur.objects.get(pseudo=user_pseudo)
+            username = form.cleaned_data['pseudo']
+            password = form.cleaned_data['password']  # Adapté à ton champ de formulaire
 
-            request.session['logged_user_id'] = user.id_utilisateur
-            return redirect('index')
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                auth_login(request, user)  # Connexion sécurisée
+
+                return redirect('index')
+            else:
+                form.add_error(None, 'Identifiants invalides')
 
     else:
         form = LoginForm()
@@ -92,7 +92,7 @@ def geocode_address(address):
 
 
 def creer_plante(request):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
 
     if not logged_user:
         return redirect('login')  # Rediriger si non connecté
@@ -101,7 +101,7 @@ def creer_plante(request):
         form = PlanteForm(request.POST, request.FILES)
         if form.is_valid():
             plante = form.save(commit=False)
-            plante.utilisateur = logged_user  # Associer l'utilisateur connecté
+            plante.utilisateur = logged_user
 
             # Récupérer l'objet ImageFieldFile
             image_file = request.FILES['photo_plante']
@@ -110,7 +110,7 @@ def creer_plante(request):
             image = Image.open(BytesIO(image_file.read()))
             target_size = (64, 64)  # Remplacez par la taille d'entrée de votre modèle
             predictions = predict_image(model, image, target_size)
-            is_plant = predictions[0][0] > 0.5  # Remplacez par la logique de votre modèle
+            is_plant = predictions[0][0] > 0.5
 
             if is_plant:
                 plante.save()
@@ -169,7 +169,7 @@ def demandes(request):
 
 
 def faire_demande(request):
-    logged_user = get_logged_form_request(request)  # Récupérer l'utilisateur connecté
+    logged_user = request.user
     if logged_user:
         if request.method == 'POST':
             form = DemandeForm(request.POST, logged_user=logged_user)  # Passer l'utilisateur au formulaire
@@ -230,7 +230,7 @@ def get_demandes_with_marker_info(logged_user, filter_by_receiver=False, only_ac
                 markers.append({
                     'id': demande.id,
                     'adresse': full_address,
-                    'pseudo': demande.utilisateur_demandeur.pseudo,
+                    'pseudo': demande.utilisateur_demandeur.username,
                     'nom': plante_nom,
                     'latitude': lat,
                     'longitude': lon,
@@ -243,7 +243,7 @@ def get_demandes_with_marker_info(logged_user, filter_by_receiver=False, only_ac
     return markers
 
 def filtered_garde_liste(request):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     if logged_user:
         markers = get_demandes_with_marker_info(logged_user)
         if not markers:
@@ -255,7 +255,7 @@ def filtered_garde_liste(request):
         return redirect('login')
 
 def interactiv_map(request):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     if logged_user:
         markers = get_demandes_with_marker_info(
             logged_user, 
@@ -272,7 +272,7 @@ def interactiv_map(request):
         return redirect('login')
 
 def research_pro(request):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     search_query = request.GET.get('q', '')
     utilisateurs_pro = Utilisateur.objects.filter(is_pro=True)
     if logged_user:
@@ -287,7 +287,7 @@ def research_pro(request):
 
 
 def demande(request):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     if logged_user:
         if request.method == 'POST':
             form = DemandeAideForm(request.POST, request.FILES)
@@ -307,7 +307,7 @@ def demande(request):
 
 
 def demande_aide(request,id):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     if logged_user:
         if request.method == 'POST':
             form = CommentaireForm(request.POST)
@@ -329,7 +329,7 @@ def demande_aide(request,id):
         return redirect('login')
 
 def all_demande_garde(request):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     if logged_user:
         if request.method == "POST":
             demande_id = request.POST.get("demande_id")
@@ -346,7 +346,7 @@ def all_demande_garde(request):
         return redirect('login')
 
 def garde(request,id):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     form= GardeForm(request.POST)
     if logged_user:
         if request.method == 'POST':
@@ -387,7 +387,7 @@ def rgpd(request):
                   {})
 
 def suppression(request):
-    logged_user = get_logged_form_request(request)
+    logged_user = request.user
     if logged_user:
 
 
@@ -397,7 +397,7 @@ def suppression(request):
         return redirect('login')
 
 def supprimer(request):
-    user = get_object_or_404(Utilisateur, id_utilisateur=request.session['logged_user_id'])
+    user = get_object_or_404(Utilisateur, id=request.session['logged_user_id'])
 
     user.delete()
     logout(request)
