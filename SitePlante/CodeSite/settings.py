@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = "quelblow"
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework_simplejwt',
-    'pageprincipale',
+    'pageprincipale.apps.PageprincipaleConfig',
     
 ]
 MIDDLEWARE = [

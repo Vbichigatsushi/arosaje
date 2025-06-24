@@ -37,6 +37,7 @@ class Utilisateur(models.Model):
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     rgpd_accepted = models.BooleanField(default=False)
+    date_auth = models.DateField(null=True, blank=True)
 
     def set_password(self, raw_password):
 

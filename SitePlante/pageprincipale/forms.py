@@ -38,7 +38,7 @@ from .models import Utilisateur  # Assure-toi que ton modèle est bien importé
 class UserNormalProfileForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        exclude = ['adresse', 'longitude', 'latitude']
+        exclude = ['adresse', 'longitude', 'latitude', 'date_auth']
 
     def clean_password(self):
         password = self.cleaned_data.get('password')

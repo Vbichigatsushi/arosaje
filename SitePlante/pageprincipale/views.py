@@ -18,6 +18,7 @@ import os
 from .models import Plante
 from PIL import Image
 from io import BytesIO
+from django.utils import timezone
 
 model_path = os.path.join(os.path.dirname(__file__), 'models', 'mon_modele.h5')
 model = load_model(model_path)
@@ -68,6 +69,9 @@ def login(request):
         if form.is_valid():
             user_pseudo = form.cleaned_data['pseudo']
             user = Utilisateur.objects.get(pseudo=user_pseudo)
+            
+            user.date_auth = timezone.now()
+            user.save()
 
             request.session['logged_user_id'] = user.id_utilisateur
             return redirect('index')
