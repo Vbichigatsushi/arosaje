@@ -32,7 +32,7 @@ class Adresse(models.Model):
 
 class Utilisateur(AbstractUser):
     is_pro = models.BooleanField(default=False)
-    adresse = models.ForeignKey('Adresse', on_delete=models.CASCADE)
+    adresse = models.ForeignKey('Adresse', null=True,on_delete=models.CASCADE)
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     rgpd_accepted = models.BooleanField(default=False)

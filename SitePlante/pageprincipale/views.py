@@ -406,3 +406,37 @@ def supprimer(request):
 def liste_plantes(request):
     plantes = Plante.objects.all().values()  # Récupère toutes les plantes sous forme de dictionnaire
     return JsonResponse(list(plantes), safe=False)
+
+def changer_adresse(request):
+
+        user=request.user
+        if request.method == 'POST':
+            adresse_form = AdressForm(request.POST)
+
+            if  adresse_form.is_valid():
+                adresse = adresse_form.save()
+                address = f"{adresse.numero} {adresse.voie} {adresse.ville}"
+                lat, lon = geocode_address(address)
+
+                if lat is not None and lon is not None:
+
+                    user.adresse = adresse
+                    user.latitude = lat
+                    user.longitude = lon
+                    user.save()
+
+                    return redirect('profil')
+
+                else:
+                    adresse_form.add_error(None, "Erreur de géocodage.")
+                    return render(request, 'changement_des_donnees.html', {
+                        'adresse_form': adresse_form
+                    })
+
+        else:
+            adresse_form = AdressForm()
+
+        return render(request, 'changement_des_donnees.html', {
+            'adresse_form': adresse_form,
+        })
+

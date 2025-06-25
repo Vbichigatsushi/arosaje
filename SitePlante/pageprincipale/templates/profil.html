@@ -8,7 +8,7 @@
         <br>
         <h2> Vos informations</h2>
         <p> Votre pseudo : {{ logged_user.username}} </p>
-        <p> Votre adresse : {{ logged_user.adresse}} </p>
+        <p> Votre adresse : {{ logged_user.adresse}} </p> <a href="{% url 'changer_adresse'%}"><p>Changer adresse</p> </a>
         <p> Vous êtes un pro: {{ logged_user.is_pro}} </p>
 
         <section id="plantes" class="plants-grid">
