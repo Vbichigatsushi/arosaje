@@ -1,30 +1,29 @@
-from sys import prefix
-import requests
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm, \
-    CommentaireForm, GardeForm,CommentaireForm,MessageImage
-from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
-import json
-from .forms import UserNormalProfileForm
-import urllib.parse
-from django.contrib.auth import logout
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from .forms import PlanteForm
-from .utils.model_loader import load_model
-from .utils.image_predictor import predict_image
+
 import os
-from .models import Plante
-from PIL import Image
+import json
+import urllib.parse
 from io import BytesIO
-from django.contrib.auth import authenticate, login as auth_login, logout
-from django.shortcuts import render, redirect
-from .forms import LoginForm
-model_path = os.path.join(os.path.dirname(__file__), 'models', 'mon_modele.h5')
-model = load_model(model_path)
+from PIL import Image
+
+import requests
 from haversine import haversine, Unit
 from django.utils import timezone
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib.auth.decorators import login_required
+
+from pageprincipale.forms import (
+    LoginForm, UserNormalProfileForm, AdressForm, PlanteForm,
+    DemandeForm, DemandeAideForm, CommentaireForm,
+    GardeForm, MessageImage
+)
+from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
+from .utils.model_loader import load_model
+from .utils.image_predictor import predict_image
+
+model_path = os.path.join(os.path.dirname(__file__), 'models', 'mon_modele.h5')
+model = load_model(model_path)
 
 
 
@@ -62,7 +61,7 @@ def login(request):
 
         if form.is_valid():
             username = form.cleaned_data['pseudo']
-            password = form.cleaned_data['password']  # Adapté à ton champ de formulaire
+            password = form.cleaned_data['password']  
 
             user = authenticate(request, username=username, password=password)
             

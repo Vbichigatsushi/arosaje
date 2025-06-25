@@ -40,6 +40,7 @@ class PageprincipaleConfig(AppConfig):
                     user.adresse = None
                     user.latitude = None
                     user.longitude = None
+                                       
                     
                     user.save()
                     
