@@ -78,18 +78,32 @@ def login(request):
 
     return render(request, 'login.html', {'form': form})
 
-def geocode_address(address):
+
+
+def geocode_address(address, expected_city=None, expected_postal_code=None, expected_street=None):
     address_encoded = urllib.parse.quote(address)
     url = f"https://api-adresse.data.gouv.fr/search/?q={address_encoded}&limit=1"
     response = requests.get(url)
+
     if response.status_code == 200:
         data = response.json()
         if data.get('features'):
-            geometry = data['features'][0]['geometry']
+            feature = data['features'][0]
+            properties = feature['properties']
+            geometry = feature['geometry']
             lon, lat = geometry['coordinates']
-            return lat, lon
-    print(f"Erreur de l'API: {response.status_code}")
+
+            city_ok = expected_city and properties.get('city', '').lower() == expected_city.lower()
+            postcode_ok = expected_postal_code and str(properties.get('postcode', '')) == str(expected_postal_code)
+            street_ok = expected_street and expected_street.lower() in properties.get('name', '').lower()
+
+            if city_ok and postcode_ok and street_ok:
+                return lat, lon
+
+            print("Adresse incohérente :", properties)
     return None, None
+
+
 
 
 def creer_plante(request):
@@ -132,8 +146,13 @@ def register(request):
 
         if userclassique_form.is_valid() and adresse_form.is_valid():
             adresse = adresse_form.save()
-            address = f"{adresse.numero} {adresse.voie} {adresse.ville}"
-            lat, lon = geocode_address(address)
+            address = f"{adresse.numero} {adresse.voie} {adresse.code_postale} {adresse.ville}"
+            lat, lon = geocode_address(
+                address,
+                expected_city=adresse.ville,
+                expected_postal_code=adresse.code_postale,
+                expected_street=adresse.voie
+            )
 
             if lat is not None and lon is not None:
                 user = userclassique_form.save(commit=False)
@@ -416,8 +435,13 @@ def changer_adresse(request):
 
             if  adresse_form.is_valid():
                 adresse = adresse_form.save()
-                address = f"{adresse.numero} {adresse.voie} {adresse.ville}"
-                lat, lon = geocode_address(address)
+                address = f"{adresse.numero} {adresse.voie} {adresse.code_postale} {adresse.ville}"
+                lat, lon = geocode_address(
+                    address,
+                    expected_city=adresse.ville,
+                    expected_postal_code=adresse.code_postale,
+                    expected_street=adresse.voie
+                )
 
                 if lat is not None and lon is not None:
 
