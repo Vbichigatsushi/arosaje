@@ -1,6 +1,8 @@
 {% extends "pagedebase.html" %} {% load static %} {% block title %}Liste des
 Plantes{% endblock %} {% block content %}
 
+<meta name="csrf-token" content="{{ csrf_token }}" />
+
 <br /><br /><br />
 
 <h3 id="plantes-dispo">Gardes disponibles dans un rayon de 500 mètres:</h3>

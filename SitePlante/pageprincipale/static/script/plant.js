@@ -42,6 +42,33 @@ if (markersData.length === 0) {
     distance.textContent = `Distance : ${distanceText}`;
     card.appendChild(distance);
 
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/accepter_demande/";
+
+    const csrfToken = document
+      .querySelector('meta[name="csrf-token"]')
+      .getAttribute("content");
+
+    const csrfInput = document.createElement("input");
+    csrfInput.type = "hidden";
+    csrfInput.name = "csrfmiddlewaretoken";
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "demande_id";
+    input.value = marker.id;
+    form.appendChild(input);
+
+    const bouton = document.createElement("button");
+    bouton.type = "submit";
+    bouton.textContent = "Accepter la demande";
+    bouton.classList.add("btn", "btn-success", "btn-sm");
+
+    form.appendChild(bouton);
+    card.appendChild(form);
     plantesList.appendChild(card);
   });
 }

@@ -139,6 +139,17 @@ def creer_plante(request):
     return render(request, 'creer_plante.html', {'form': form})
 
 
+def accepter_demande(request):
+    logged_user = request.user
+    if logged_user.is_authenticated:
+        demande_id = request.POST.get("demande_id")
+        demande = get_object_or_404(Demande_plante, id=demande_id)
+        if demande.utilisateur_receveur is None:
+            demande.utilisateur_receveur = logged_user
+            demande.statut = "acceptée"
+            demande.save()
+    return redirect('filtered-garde-liste')
+
 def register(request):
     if request.method == 'POST':
         userclassique_form = UserNormalProfileForm(request.POST, prefix="uc")
