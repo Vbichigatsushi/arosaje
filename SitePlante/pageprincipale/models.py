@@ -32,7 +32,7 @@ class Adresse(models.Model):
 
 class Utilisateur(AbstractUser):
     is_pro = models.BooleanField(default=False)
-    adresse = models.ForeignKey('Adresse', null=True,on_delete=models.CASCADE)
+    adresse = models.ForeignKey('Adresse', null=True, blank=True, on_delete=models.SET_NULL)
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     rgpd_accepted = models.BooleanField(default=False)
@@ -42,7 +42,7 @@ class Utilisateur(AbstractUser):
             raise ValidationError("Vous devez accepter les conditions RGPD.")
 
     def __str__(self):
-        return self.username  # Ou self.get_full_name() si tu préfères
+        return self.username  
 
 class Plante(models.Model):
     id_plante = models.AutoField(primary_key=True)

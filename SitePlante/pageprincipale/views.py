@@ -24,6 +24,7 @@ from .forms import LoginForm
 model_path = os.path.join(os.path.dirname(__file__), 'models', 'mon_modele.h5')
 model = load_model(model_path)
 from haversine import haversine, Unit
+from django.utils import timezone
 
 
 
@@ -64,7 +65,7 @@ def login(request):
             password = form.cleaned_data['password']  # Adapté à ton champ de formulaire
 
             user = authenticate(request, username=username, password=password)
-
+            
             if user is not None:
                 auth_login(request, user)  # Connexion sécurisée
 
