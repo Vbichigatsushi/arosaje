@@ -12,7 +12,14 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set environment variables
-      run: echo "SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }}" >> $GITHUB_ENV
+      run: |
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }}" >> $GITHUB_ENV
+        echo "DEBUG=${{ secrets.DEBUG_DJANGO }}" >> $GITHUB_ENV
+        echo "NAME=${{ secrets.BDD_NAME }}" >> $GITHUB_ENV
+        echo "USER=${{ secrets.BDD_USER }}" >> $GITHUB_ENV
+        echo "PASSWORD=${{ secrets.BDD_PASSWORD }}" >> $GITHUB_ENV
+        echo "HOST=${{ secrets.BDD_HOST }}" >> $GITHUB_ENV
+        echo "PORT=${{ secrets.BDD_PORT }}" >> $GITHUB_ENV
 
     - name: Set up Docker
       uses: docker/setup-buildx-action@v2
@@ -57,8 +64,17 @@ jobs:
 
     - name: Run docker image
       run: |
-        docker run -d --name arosaje_container -e SECRET_KEY="${{ secrets.SECRET_KEY_DJANGO }}" arosaje_web
+        docker run -d --name arosaje_container \
+          -e SECRET_KEY="${{ secrets.SECRET_KEY_DJANGO }}" \
+          -e DEBUG="${{ secrets.DEBUG_DJANGO }}" \
+          -e NAME="${{ secrets.BDD_NAME }}" \
+          -e USER="${{ secrets.BDD_USER }}" \
+          -e PASSWORD="${{ secrets.BDD_PASSWORD }}" \
+          -e HOST="${{ secrets.BDD_HOST }}" \
+          -e PORT="${{ secrets.BDD_PORT }}" \
+          arosaje_web
         docker ps
+
 
     - name: Run Tests with Coverage
       run: docker exec arosaje_container coverage run manage.py test
