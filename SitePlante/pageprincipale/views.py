@@ -3,7 +3,7 @@ import requests
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from pageprincipale.forms import LoginForm, UserNormalProfileForm, AdressForm, PlanteForm, DemandeForm, DemandeAideForm, \
-    CommentaireForm, GardeForm,CommentaireForm,MessageImage
+    CommentaireForm, GardeForm,CommentaireForm,MessageImage,FormChangPseudo
 from .models import Utilisateur, Plante, Demande_plante, Message, Commentaire
 import json
 from .forms import UserNormalProfileForm
@@ -24,9 +24,9 @@ from .forms import LoginForm
 model_path = os.path.join(os.path.dirname(__file__), 'models', 'mon_modele.h5')
 model = load_model(model_path)
 from haversine import haversine, Unit
-
-
-
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+@login_required(login_url='login')
 def profil(request):
     logged_user = request.user
     plantes_utilisateur = Plante.objects.filter(utilisateur=logged_user)
@@ -37,9 +37,8 @@ def profil(request):
         return render(request, 'profil.html', {'Demande_demandeur':Demande_demander,'logged_user': logged_user,'plantes_utilisateur': plantes_utilisateur,'Demande_receveur': Demande_receveur})
 
     else:
-        # Redirige vers la page de connexion si non connecté
         return redirect('login')
-
+@login_required(login_url='login')
 def index(request):
     logged_user = request.user
     dernieres_demandes = (
@@ -61,12 +60,12 @@ def login(request):
 
         if form.is_valid():
             username = form.cleaned_data['pseudo']
-            password = form.cleaned_data['password']  # Adapté à ton champ de formulaire
+            password = form.cleaned_data['password']
 
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
-                auth_login(request, user)  # Connexion sécurisée
+                auth_login(request, user)
 
                 return redirect('index')
             else:
@@ -90,7 +89,7 @@ def geocode_address(address):
     print(f"Erreur de l'API: {response.status_code}")
     return None, None
 
-
+@login_required(login_url='login')
 def creer_plante(request):
     logged_user = request.user
 
@@ -103,12 +102,12 @@ def creer_plante(request):
             plante = form.save(commit=False)
             plante.utilisateur = logged_user
 
-            # Récupérer l'objet ImageFieldFile
+
             image_file = request.FILES['photo_plante']
 
-            # Vérifier si l'image est une plante
+
             image = Image.open(BytesIO(image_file.read()))
-            target_size = (64, 64)  # Remplacez par la taille d'entrée de votre modèle
+            target_size = (64, 64)
             predictions = predict_image(model, image, target_size)
             is_plant = predictions[0][0] > 0.5
 
@@ -160,14 +159,14 @@ def register(request):
         'adresse_form': adresse_form,
     })
 
-
+@login_required(login_url='login')
 def demandes(request):
 
     demandes = Demande_plante.objects.filter(statut='en attente', utilisateur_receveur__isnull=True)
 
     return render(request, 'demandes_en_attente.html', {'demandes': demandes})
 
-
+@login_required(login_url='login')
 def faire_demande(request):
     logged_user = request.user
     if logged_user:
@@ -241,7 +240,7 @@ def get_demandes_with_marker_info(logged_user, filter_by_receiver=False, only_ac
                 })
     
     return markers
-
+@login_required(login_url='login')
 def filtered_garde_liste(request):
     logged_user = request.user
     if logged_user:
@@ -253,24 +252,22 @@ def filtered_garde_liste(request):
         return render(request, 'filtered-garde-liste.html', {'markers_json': markers_json})
     else:
         return redirect('login')
-
+@login_required(login_url='login')
 def interactiv_map(request):
     logged_user = request.user
-    if logged_user:
-        markers = get_demandes_with_marker_info(
+    markers = get_demandes_with_marker_info(
             logged_user, 
             filter_by_receiver=True, 
             only_accepted=True
-        )
-        markers_json = json.dumps(markers)
+    )
+    markers_json = json.dumps(markers)
         
-        return render(request, 'interactiv-map.html', {
+    return render(request, 'interactiv-map.html', {
             'logged_user': logged_user,
             'markers_json': markers_json
         })
-    else:
-        return redirect('login')
 
+@login_required(login_url='login')
 def research_pro(request):
     logged_user = request.user
     search_query = request.GET.get('q', '')
@@ -285,27 +282,43 @@ def research_pro(request):
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
 
-
+@login_required(login_url='login')
 def demande(request):
     logged_user = request.user
-    if logged_user:
-        if request.method == 'POST':
-            form = DemandeAideForm(request.POST, request.FILES)
-            if form.is_valid():
-                Demande = form.save(commit=False)
-                Demande.User= logged_user  # Associer l'utilisateur connecté
-                Demande.save()
-                return redirect('demande')
-        else:
-            form = DemandeAideForm()
-        messages = Message.objects.order_by('-date_demande')
-        return render(request, 'demande.html',
-                      {'logged_user': logged_user, 'messages': messages,'form':form})
-    else:
-        # Redirige vers la page de connexion si non connecté
+    if not logged_user:
         return redirect('login')
 
+    search_query = request.GET.get('q', '')
+    form = DemandeAideForm()
 
+
+    messages = Message.objects.all()
+
+    if search_query:
+        messages = messages.filter(
+            Q(text__icontains=search_query) |
+            Q(User__username__icontains=search_query)
+        )
+
+    if request.method == 'POST':
+        form = DemandeAideForm(request.POST, request.FILES)
+        if form.is_valid():
+            demande = form.save(commit=False)
+            demande.User = logged_user
+            demande.save()
+            return redirect('demande')
+
+    messages = messages.order_by('-date_demande')
+
+    return render(request, 'demande.html', {
+        'logged_user': logged_user,
+        'messages': messages,
+        'form': form,
+        'search_query': search_query
+    })
+
+
+@login_required(login_url='login')
 def demande_aide(request,id):
     logged_user = request.user
     if logged_user:
@@ -327,7 +340,7 @@ def demande_aide(request,id):
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
-
+@login_required(login_url='login')
 def all_demande_garde(request):
     logged_user = request.user
     if logged_user:
@@ -344,7 +357,7 @@ def all_demande_garde(request):
                       {'logged_user': logged_user, 'Demandes': Demandes})
     else:
         return redirect('login')
-
+@login_required(login_url='login')
 def garde(request,id):
     logged_user = request.user
     form= GardeForm(request.POST)
@@ -369,23 +382,23 @@ def garde(request,id):
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
 
-
+@login_required(login_url='login')
 def supprimer_plante(request, id_plante):
     plante = get_object_or_404(Plante, id_plante=id_plante)
     if request.method == 'POST':
         plante.delete()
     return redirect('profil')
-
+@login_required(login_url='login')
 def supprimer_demande(request, demande_id):
     demande = get_object_or_404(Demande_plante, id=demande_id)
     if request.method == 'POST':
         demande.delete()
     return redirect('profil')
-
+@login_required(login_url='login')
 def rgpd(request):
     return render(request, 'rgpd.html',
                   {})
-
+@login_required(login_url='login')
 def suppression(request):
     logged_user = request.user
     if logged_user:
@@ -395,14 +408,14 @@ def suppression(request):
     else:
         # Redirige vers la page de connexion si non connecté
         return redirect('login')
-
+@login_required(login_url='login')
 def supprimer(request):
     user = get_object_or_404(Utilisateur, id=request.session['logged_user_id'])
 
     user.delete()
     logout(request)
     return redirect('login')
-
+@login_required(login_url='login')
 def liste_plantes(request):
     plantes = Plante.objects.all().values()  # Récupère toutes les plantes sous forme de dictionnaire
     return JsonResponse(list(plantes), safe=False)
@@ -440,3 +453,53 @@ def changer_adresse(request):
             'adresse_form': adresse_form,
         })
 
+@login_required(login_url='login')
+def changer_nom(request):
+    user = request.user
+    if request.method == 'POST':
+        nom_form = FormChangPseudo(request.POST)
+        if nom_form.is_valid():
+            user.username = nom_form.cleaned_data['username']
+            user.save()
+            return redirect('profil')
+        else:
+            nom_form.add_error(None, "Erreur dans le pseudo.")
+    else:
+        nom_form = FormChangPseudo(initial={'username': user.username})
+
+    return render(request, 'changement_de_nom.html', {
+        'nom_form': nom_form,
+    })
+
+def supprimer_message(request, message_id):
+    message = get_object_or_404(Message,  id_message=message_id)
+    message.delete()
+    return redirect('demande')
+def suppression_message(request,message_id):
+    logged_user = request.user
+    if logged_user:
+
+
+        return render(request, 'suppression_message.html', {'message_id':message_id})
+    else:
+
+        return redirect('login')
+def supprimer_message_image(request, message_image_id):
+    message = get_object_or_404(MessageImage, id=message_image_id)
+    if request.method == 'POST':
+        message.delete()
+    return redirect('profil')
+
+def supprimer_commentaire(request, message_id,commentaire_id):
+    commentaire = get_object_or_404(Commentaire,  id=commentaire_id)
+    commentaire.delete()
+    return redirect('demande_aide', id=message_id)
+def suppression_commentaire(request,message_id,commentaire_id):
+    logged_user = request.user
+    if logged_user:
+
+
+        return render(request, 'suppression_commentaire.html', {'commentaire_id':commentaire_id,'message_id':message_id})
+    else:
+
+        return redirect('login')

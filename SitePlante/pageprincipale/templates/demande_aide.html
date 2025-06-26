@@ -15,6 +15,13 @@
     {% endif %} le {{ message.date_demande }}
             </p>
             {% endif %}
+    {% if logged_user.id == message.User.id %}
+
+    <form action="{% url 'suppression_message' message.id_message%}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Supprimer Message</button>
+         </form>
+    {% endif %}
 <ul>
     <li>
 
@@ -24,13 +31,18 @@
         🪴
     {% endif %} le {{reponse.date_creation}} : {{reponse.text}}
         </p>
+
+    <form action="{% url 'suppression_commentaire' message.id_message reponse.id %}" method="post" style="display:inline;">                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Supprimer Message</button>
+         </form>
+    {% endif %}
         {% endfor %}
     </li>
 </ul>
 <h2>Ajouter un commentaire</h2>
  <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}  <!-- Affichage du formulaire sous forme de paragraphes -->
+        {{ form.as_p }}
         <button type="submit">Envoyer</button>
     </form>
 {% endblock %}

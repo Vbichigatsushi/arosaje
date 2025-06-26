@@ -99,3 +99,6 @@ class GardeForm(forms.ModelForm):
     class Meta:
         model = MessageImage
         fields = ['photo','text']
+
+class FormChangPseudo(forms.Form):
+    username = forms.CharField(label="Nouveau pseudo", max_length=150)
