@@ -70,15 +70,15 @@ jobs:
 
     - name: Run Tests with Docker Compose
       run: |
-        docker-compose -f compose.yml up -d
+        docker-compose -f arosaj.yml up -d
         sleep 10  # Laisse le temps à la BDD de démarrer
-        docker-compose -f compose.yml exec web coverage run manage.py test
+        docker-compose -f arosaj.yml exec web coverage run manage.py test
 
     - name: Generate Coverage Report
-      run: docker-compose -f compose.yml exec web coverage xml
+      run: docker-compose -f arosaj.yml exec web coverage xml
 
     - name: Copy Coverage Report
-      run: docker cp $(docker-compose -f compose.yml ps -q web):/app/SitePlante/coverage.xml .
+      run: docker cp $(docker-compose -f arosaj.yml ps -q web):/app/SitePlante/coverage.xml .
 
     - name: Upload Coverage Report
       uses: actions/upload-artifact@v4
