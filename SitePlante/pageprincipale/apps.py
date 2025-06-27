@@ -44,11 +44,7 @@ class PageprincipaleConfig(AppConfig):
                     
                     user.save()
                     
-                    
-                    
-                  
-                                    
-                   
+
         scheduler = BackgroundScheduler()
         scheduler.add_job(
         check_users_auth_date,
