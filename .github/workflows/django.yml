@@ -70,18 +70,17 @@ jobs:
 
     - name: Export environment variables
       run: |
-        echo "SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }}" >> $GITHUB_ENV
-        echo "DEBUG=${{ secrets.DEBUG_DJANGO }}" >> $GITHUB_ENV
-        echo "NAME=${{ secrets.BDD_NAME }}" >> $GITHUB_ENV
-        echo "USER=${{ secrets.BDD_USER }}" >> $GITHUB_ENV
-        echo "PASSWORD=${{ secrets.BDD_PASSWORD }}" >> $GITHUB_ENV
-        echo "HOST=${{ secrets.BDD_HOST }}" >> $GITHUB_ENV
-        echo "PORT=${{ secrets.BDD_PORT }}" >> $GITHUB_ENV
-
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }}" >> .env
+        echo "DEBUG=${{ secrets.DEBUG_DJANGO }}" >> .env
+        echo "NAME=${{ secrets.BDD_NAME }}" >> .env
+        echo "USER=${{ secrets.BDD_USER }}" >> .env
+        echo "PASSWORD=${{ secrets.BDD_PASSWORD }}" >> .env
+        echo "HOST=${{ secrets.BDD_HOST }}" >> .env
+        echo "PORT=${{ secrets.BDD_PORT }}" >> .env
 
     - name: Run Containers
       run: |
-        docker-compose -f arosaj.yml up -d || true
+        docker-compose -f arosaj.yml --env-file .env up -d
         docker-compose -f arosaj.yml ps
         docker-compose -f arosaj.yml logs web
 
