@@ -1,0 +1,17 @@
+{% extends "pagedebase.html" %}
+{% block title %}{% endblock %}
+{% block content %}
+<section id="accueil" class="hero">
+    <h1>Changement pseudo</h1>
+
+   <form method="POST" action="{% url 'changer_nom' %}" id="formRegister">
+    {% csrf_token %}
+<input type="hidden" name="profileType" value="Classiq_User">
+        <div id="classique_user_form">
+
+            {{ nom_form.as_p }}
+        </div>
+       <button type="submit">Changer pseudo</button>
+   </form>
+</section>
+{% endblock %}

@@ -1,32 +1,49 @@
 {% extends "pagedebase.html" %}
 {% block content %}
 <br><br><br><br>
+
 <h1>Liste des demandes d'aide</h1>
 <br><br>
+
 <h2>Ajouter une demande</h2>
- <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}  <!-- Affichage du formulaire sous forme de paragraphes -->
-        <button type="submit">Envoyer</button>
-    </form>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Envoyer</button>
+</form>
+
+<br><br><br>
+
+<h2>Rechercher une demande</h2>
+<form method="GET" action="{% url 'demande' %}">
+    <input type="text" name="q" placeholder="Rechercher un mot-clé ou un pseudo" value="{{ search_query }}">
+    <button type="submit">Rechercher</button>
+</form>
+
+<br><br><br>
+
 <ul>
     {% for message in messages %}
-        <li>{% if message.photo %}
+        <li>
             <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
-            <img src="{{ message.photo.url}}" alt="{{ message.nom }}" class="maxImgW">
-            <p>Posté par {{ message.User.username }}  {% if message.User.is_pro == True %}
-            🪴
-    {% endif %}le {{ message.date_demande }}
-            test</p>
-            {% else %}
-             <a href="{% url 'demande_aide' message.id_message %}">{{ message.text }}</a>
-            <p>Posté par {{ message.User.username }}  {% if message.User.is_pro == True %}
-            🪴
-    {% endif %}le {{ message.date_demande }}
-            test</p>
+
+            {% if message.photo %}
+                <br>
+                <img src="{{ message.photo.url }}" alt="photo" class="maxImgW">
             {% endif %}
-            <br><HR><br>
+
+            <p>
+                Posté par {{ message.User.username }}
+                {% if message.User.is_pro %}
+                    🪴
+                {% endif %}
+                le {{ message.date_demande|date:"d/m/Y H:i" }}
+            </p>
+
+            <br><hr><br>
         </li>
+    {% empty %}
+        <li>Aucun message trouvé.</li>
     {% endfor %}
 </ul>
 {% endblock %}
