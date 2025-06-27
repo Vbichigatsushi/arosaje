@@ -68,6 +68,17 @@ jobs:
         sudo chmod +x /usr/local/bin/docker-compose
         docker-compose --version
 
+    - name: Export environment variables
+      run: |
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY_DJANGO }}" >> $GITHUB_ENV
+        echo "DEBUG=${{ secrets.DEBUG_DJANGO }}" >> $GITHUB_ENV
+        echo "NAME=${{ secrets.BDD_NAME }}" >> $GITHUB_ENV
+        echo "USER=${{ secrets.BDD_USER }}" >> $GITHUB_ENV
+        echo "PASSWORD=${{ secrets.BDD_PASSWORD }}" >> $GITHUB_ENV
+        echo "HOST=${{ secrets.BDD_HOST }}" >> $GITHUB_ENV
+        echo "PORT=${{ secrets.BDD_PORT }}" >> $GITHUB_ENV
+
+
     - name: Run Containers
       run: |
         docker-compose -f arosaj.yml up -d || true
