@@ -9,12 +9,12 @@ class LoginForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        pseudo = cleaned_data.get('pseudo')
+        username = cleaned_data.get('username')
         password = cleaned_data.get('password')
 
-        if pseudo and password:
+        if username and password:
             try:
-                user = Utilisateur.objects.get(pseudo=pseudo)
+                user = Utilisateur.objects.get(username=username)
 
                 if not user.check_password(password):
                     raise forms.ValidationError("Pseudo ou mot de passe incorrect.")
@@ -38,7 +38,7 @@ from .models import Utilisateur  # Assure-toi que ton modèle est bien importé
 class UserNormalProfileForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        exclude = ['adresse', 'longitude', 'latitude']
+        fields = ['username', 'password','rgpd_accepted','is_pro']
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
@@ -99,3 +99,6 @@ class GardeForm(forms.ModelForm):
     class Meta:
         model = MessageImage
         fields = ['photo','text']
+
+class FormChangPseudo(forms.Form):
+    username = forms.CharField(label="Nouveau pseudo", max_length=150)

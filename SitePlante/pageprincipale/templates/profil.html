@@ -7,8 +7,8 @@
         <br>
         <br>
         <h2> Vos informations</h2>
-        <p> Votre pseudo : {{ logged_user.pseudo}} </p>
-        <p> Votre adresse : {{ logged_user.adresse}} </p>
+        <p> Votre pseudo : {{ logged_user.username}} </p> <a href="{% url 'changer_nom'%}"><p>Changer de pseudo</p> </a>
+        <p> Votre adresse : {{ logged_user.adresse}} </p> <a href="{% url 'changer_adresse'%}"><p>Changer adresse</p> </a>
         <p> Vous êtes un pro: {{ logged_user.is_pro}} </p>
 
         <section id="plantes" class="plants-grid">
@@ -76,10 +76,6 @@
          <form action="{% url 'suppression'%}" method="post" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Supprimer compte</button>
-         </form>
-         <form action="{% url 'login'%}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Logout</button>
          </form>
     </main>
 {% endblock %}

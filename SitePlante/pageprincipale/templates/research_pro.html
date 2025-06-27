@@ -6,13 +6,11 @@
     <input type="text" name="q" placeholder="Rechercher un professionnel" value="{{ search_query }}">
     <button type="submit">Rechercher</button>
 </form><br><br><br>
-{% for user in user_pro %}
-<span>
-{{user.pseudo}}
-  <br><br>
-  <HR>
-</span>
-{% endfor %}
+
+
+
+
+    <p>{{llm_reponse}}</p>
 
 {% endblock %}
 
