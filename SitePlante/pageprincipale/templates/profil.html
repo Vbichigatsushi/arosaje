@@ -77,9 +77,5 @@
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Supprimer compte</button>
          </form>
-         <form action="{% url 'login'%}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Logout</button>
-         </form>
     </main>
 {% endblock %}
