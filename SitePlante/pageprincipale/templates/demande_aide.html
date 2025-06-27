@@ -31,7 +31,7 @@
         🪴
     {% endif %} le {{reponse.date_creation}} : {{reponse.text}}
         </p>
-
+    {% if logged_user.id == reponse.User.id %}
     <form action="{% url 'suppression_commentaire' message.id_message reponse.id %}" method="post" style="display:inline;">                {% csrf_token %}
                 <button type="submit" class="btn btn-danger">Supprimer Message</button>
          </form>

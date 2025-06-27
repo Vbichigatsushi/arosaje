@@ -349,7 +349,6 @@ def demande_aide(request,id):
         return render(request, 'demande_aide.html',
                       {'logged_user': logged_user, 'message': message, 'reponses': reponses,'form':form})
     else:
-        # Redirige vers la page de connexion si non connecté
         return redirect('login')
 @login_required(login_url='login')
 def all_demande_garde(request):
@@ -593,7 +592,7 @@ def rag_with_mistral(query: str, embeddings: dict) -> str:
                 "role": "system",
                 "content": (
                     "Tu es un jardinier professionnel qui donne des conseils très précis. "
-                    "Si la question n'a aucun rapport avec les plantes, dire 'Je ne suis expert qu'en plante veillez reposez une question' "
+                    "Si la question n'a aucun rapport avec les plantes, dire 'Je ne suis expert qu'en plante veiller reposez une question' "
                     "et ne rien répondre d'autre. "
                     "Tu ne réponds à la query entre triple simple quote qu'avec les 5 informations données par le RAG si les informations sont présentes "
                     "et vérifie que ce soit bien la bonne plante. "
