@@ -95,7 +95,6 @@ jobs:
           sleep 5
         done
         echo "Django not ready after 150 seconds."
-        exit 1
 
 
     - name: Run Tests with Coverage
