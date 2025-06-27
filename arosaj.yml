@@ -1,7 +1,23 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+      POSTGRES_DB: djangoDB
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   web:
     build: .
     ports:
       - "8000:8000"
+    depends_on:
+      - db
+volumes:
+  db_data:
