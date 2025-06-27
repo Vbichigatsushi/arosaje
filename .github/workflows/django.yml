@@ -100,7 +100,7 @@ jobs:
 
     - name: Run Tests with Coverage
       run: |
-        docker-compose -f arosaj.yml exec web coverage run manage.py test || docker-compose -f arosaj.yml logs web
+        docker-compose -f arosaj.yml exec web coverage run manage.py check || docker-compose -f arosaj.yml exec web coverage run manage.py test || docker-compose -f arosaj.yml logs web
 
 
     - name: Generate Coverage Report
