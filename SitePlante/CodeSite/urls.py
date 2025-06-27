@@ -31,11 +31,6 @@ from django.urls import path
 from pageprincipale.views import index,login,register,profil,creer_plante,research_pro
 
 from pageprincipale.views import liste_plantes
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -64,7 +59,4 @@ urlpatterns = [
     path('supprimer_message/<int:message_id>/', supprimer_message, name='supprimer_message'),
     path('suppression_commentaire/<int:message_id>/<int:commentaire_id>/',suppression_commentaire, name='suppression_commentaire'),
     path('supprimer_commentaire/<int:message_id>/<int:commentaire_id>/', supprimer_commentaire, name='supprimer_commentaire'),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
