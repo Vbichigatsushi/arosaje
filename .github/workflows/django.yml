@@ -62,22 +62,23 @@ jobs:
     - name: Load Docker Image from Tarball
       run: docker load -i arosaje_web.tar
 
-    - name: Install Docker Compose
+    - name: Run Containers
       run: |
-        sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
-        docker-compose --version
+        docker-compose -f arosaj.yml up -d || true
+        docker-compose -f arosaj.yml ps
+        docker-compose -f arosaj.yml logs web
 
-    - name: Run Tests with Docker Compose
-      run: |
-        docker-compose -f arosaj.yml up -d
-        sleep 10  # Laisse le temps à la BDD de démarrer
-        docker-compose -f arosaj.yml exec web coverage run manage.py test
+    # Facultatif, ajoute un petit sleep si nécessaire
+    - name: Wait for DB readiness (optionnel)
+      run: sleep 10
+
+    - name: Run Tests with Coverage
+      run: docker-compose -f arosaj.yml exec web coverage run manage.py test
 
     - name: Generate Coverage Report
       run: docker-compose -f arosaj.yml exec web coverage xml
 
-    - name: Copy Coverage Report
+    - name: Copy Coverage Report from Container
       run: docker cp $(docker-compose -f arosaj.yml ps -q web):/app/SitePlante/coverage.xml .
 
     - name: Upload Coverage Report
@@ -85,6 +86,7 @@ jobs:
       with:
         name: coverage-report
         path: coverage.xml
+
 
 
   sonarQubeScan:
